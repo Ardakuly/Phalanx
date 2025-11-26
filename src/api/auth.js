@@ -2,7 +2,7 @@ import axiosInstance from "./axios";
 
 export async function signUp(payload) {
   try {
-    const response = await axiosInstance.post("/sign-up", payload);
+    const response = await axiosInstance.post("/public/user/sign-up", payload);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -15,7 +15,7 @@ export async function signUp(payload) {
 
 export async function signIn(payload) {
   try {
-    const response = await axiosInstance.post("/sign-in", payload);
+    const response = await axiosInstance.post("/public/user/sign-in", payload);
     return response.data; // assuming server returns { token: "..." }
   } catch (error) {
     if (error.response) {

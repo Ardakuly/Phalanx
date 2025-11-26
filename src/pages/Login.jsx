@@ -22,7 +22,7 @@ export default function Login() {
       console.log(response);
       localStorage.setItem("token", response.accessToken);
       toast.success("Login successful!");
-      navigate("/dashboard"); // replace with your dashboard route
+      navigate("/products"); // replace with your dashboard route
     } catch (err) {
       toast.error(err.message);
     } finally {

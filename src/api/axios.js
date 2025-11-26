@@ -1,10 +1,18 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "/api/public/user", // Base URL for auth endpoints
+  baseURL: "/api", // Base URL for auth endpoints
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default axiosInstance;
