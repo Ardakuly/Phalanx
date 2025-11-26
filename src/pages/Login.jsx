@@ -19,7 +19,8 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await signIn(data);
-      localStorage.setItem("token", response.token);
+      console.log(response);
+      localStorage.setItem("token", response.accessToken);
       toast.success("Login successful!");
       navigate("/dashboard"); // replace with your dashboard route
     } catch (err) {
