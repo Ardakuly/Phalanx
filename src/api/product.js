@@ -21,3 +21,17 @@ export const getProducts = async (filters = {}) => {
   return res.data;
 };
 
+export const addProductsToStock = async (products) => {
+  try {
+    const res = await axiosInstance.post(
+      "/admin/inbound_document/add",
+      products       // must be an array of ProductRequestDto
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Failed to add products to stock", error);
+    throw error;
+  }
+};
+
+

@@ -19,7 +19,7 @@ export async function signIn(payload) {
     return response.data; // assuming server returns { token: "..." }
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.message || "Invalid credentials");
+      throw new Error(error.response.data.error || "Invalid credentials");
     } else {
       throw new Error(error.message);
     }

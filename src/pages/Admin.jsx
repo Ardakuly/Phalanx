@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import { getUsers, updateUser } from "../api/user";
+import { getUser, getUsers } from "../api/user";
 import UserRow from "../components/UserRow";
 
 export default function Admin() {
-  const user = { firstName: "Admin", lastName: "User", role: "Admin" };
+  const [user, setUser] = useState({});
   const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function fetchUser() {
+      const data = await getUser();
+      setUser(data);
+    }
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -15,10 +23,9 @@ export default function Admin() {
     fetchUsers();
   }, []);
 
-  const handleUserUpdate = async (userId, updates) => {
-    await updateUser(userId, updates);
+  const handleUserUpdate = (email, updates) => {
     setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, ...updates } : u))
+      prev.map((u) => (u.email === email ? { ...u, ...updates } : u))
     );
   };
 
@@ -28,6 +35,7 @@ export default function Admin() {
 
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-4">User Management</h2>
+
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-gray-100">
@@ -38,12 +46,13 @@ export default function Admin() {
                 <th className="px-4 py-2">Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {users.map((u) => (
                 <UserRow
-                  key={u.id}
+                  key={u.email}
                   user={u}
-                  onUpdate={(updates) => handleUserUpdate(u.id, updates)}
+                  onUpdate={(updates) => handleUserUpdate(u.email, updates)}
                 />
               ))}
             </tbody>

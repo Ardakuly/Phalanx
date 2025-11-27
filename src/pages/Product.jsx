@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Input from "../components/Input";
 import ProductCard from "../components/ProductCard";
+import AddProductModal from "../components/AddProductModal";
 import { getProducts } from "../api/product";
 import { getUser } from "../api/user";
 
@@ -15,6 +16,8 @@ export default function Products() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  const [openModal, setOpenModal] = useState(false); // ← MODAL STATE
+
   // Load user info
   useEffect(() => {
     async function fetchUser() {
@@ -26,7 +29,7 @@ export default function Products() {
 
   // Load products from backend
   useEffect(() => {
-    const timer = setTimeout(() => fetchProducts(), 300); // debounce search
+    const timer = setTimeout(() => fetchProducts(), 300);
     return () => clearTimeout(timer);
   }, [search, page]);
 
@@ -53,11 +56,15 @@ export default function Products() {
     setBasket((prev) => [...prev, product]);
   };
 
-  const handleAddProduct = () => alert("Add Product Clicked!");
+  // ---- OPEN MODAL instead of alert ----
+  const handleAddProduct = () => setOpenModal(true);
+
   const handleReportClick = (type) => alert(`Report clicked: ${type}`);
 
+  const refreshAfterAdd = () => fetchProducts(); // refresh UI after modal submit
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100h-full bg-gray-100 flex flex-col">
       <Header
         page="products"
         user={user}
@@ -65,9 +72,10 @@ export default function Products() {
         onReportClick={handleReportClick}
       />
 
-      <div className="flex p-4 gap-6">
-        {/* Products List */}
-        <div className="flex-1">
+      <div className="flex p-4 gap-6 flex-1 overflow-hidden">
+
+        {/* LEFT: Products */}
+        <div className="flex-1 overflow-y-auto">
           <Input
             label="Search Products"
             value={search}
@@ -106,18 +114,46 @@ export default function Products() {
           </div>
         </div>
 
-        {/* Basket */}
-        <div className="w-1/3 bg-white p-4 rounded-xl shadow-md">
-          <h2 className="text-lg font-semibold mb-2">Basket</h2>
-          {basket.length === 0 && <p>No products added</p>}
-          {basket.map((item, index) => (
-            <div key={index} className="flex justify-between py-1">
-              <span>{item.name}</span>
-              <span>{item.sellingPrice}</span>
+        {/* RIGHT: Basket section */}
+        <div className="w-1/3 bg-white p-4 rounded-xl shadow-md flex flex-col h-full min-h-0">
+          <h2 className="text-lg font-semibold mb-3">Basket</h2>
+
+          <div className="flex-1 overflow-y-auto mb-3">
+            {basket.length === 0 && <p className="text-gray-500">No products added</p>}
+
+            {basket.map((item, index) => (
+              <div key={index} className="flex justify-between py-2 border-b text-sm">
+                <span>{item.name}</span>
+                <span className="font-semibold">{item.sellingPrice} ₸</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t pt-3 shrink-0">
+            <div className="flex justify-between text-lg font-semibold mb-2">
+              <span>Total:</span>
+              <span>
+                {basket.reduce((acc, item) => acc + item.sellingPrice, 0)} ₸
+              </span>
             </div>
-          ))}
+
+            <button
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-center font-medium"
+              onClick={() => alert("Sell clicked")}
+              disabled={basket.length === 0}
+            >
+              Sell
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* MODAL RENDER */}
+      <AddProductModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onSuccess={refreshAfterAdd}
+      />
     </div>
   );
 }

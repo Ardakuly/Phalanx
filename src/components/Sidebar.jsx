@@ -8,7 +8,7 @@ export default function Sidebar() {
 
   const links = [
     { name: "Products", path: "/products" },
-    { name: "Admin", path: "/admin" },
+    { name: "Administration", path: "/admin" },
   ];
 
   return (

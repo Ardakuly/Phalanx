@@ -10,7 +10,16 @@ export const getUsers = async () => {
   return res.data;
 };
 
-export const updateUser = async () => {
-  const res = await axiosInstance.updateUser("/user");
-  return res.data;
+export const changeUserRole = async (email, role) => {
+  return axiosInstance.patch(`/user/${email}/role`, null, {
+    params: { role }
+  });
+};
+
+export const enableUser = async (email) => {
+  return axiosInstance.patch(`/user/${email}/enable`);
+};
+
+export const disableUser = async (email) => {
+  return axiosInstance.patch(`/user/${email}/disable`);
 };
