@@ -50,54 +50,52 @@ export default function Products() {
     setLoading(false);
   };
 
-  // Add product to basket (with count logic)
+  // Add product to basket — using BARCODE as unique key
   const handleAddToBasket = (product) => {
+    const key = product.barcode; // barcode MUST be unique
+
     setBasket((prev) => {
-      const existing = prev.find((p) => p.id === product.id);
+      const existing = prev.find((p) => p.key === key);
 
       if (existing) {
         return prev.map((p) =>
-          p.id === product.id ? { ...p, count: p.count + 1 } : p
+          p.key === key ? { ...p, count: p.count + 1 } : p
         );
       }
 
-      return [...prev, { ...product, count: 1 }];
+      return [...prev, { ...product, key, count: 1 }];
     });
   };
 
-  // Increase product count
   const handleIncrease = (product) => {
     setBasket((prev) =>
       prev.map((p) =>
-        p.id === product.id ? { ...p, count: p.count + 1 } : p
+        p.key === product.key ? { ...p, count: p.count + 1 } : p
       )
     );
   };
 
-  // Decrease count / remove if reaches 0
   const handleDecrease = (product) => {
     setBasket((prev) =>
       prev
         .map((p) =>
-          p.id === product.id ? { ...p, count: p.count - 1 } : p
+          p.key === product.key ? { ...p, count: p.count - 1 } : p
         )
         .filter((p) => p.count > 0)
     );
   };
 
-  // Remove item entirely
   const handleRemove = (product) => {
-    setBasket((prev) => prev.filter((p) => p.id !== product.id));
+    setBasket((prev) => prev.filter((p) => p.key !== product.key));
   };
 
   const handleSell = () => {
     alert("Sell clicked");
   };
 
-  const refreshAfterAdd = async () => fetchProducts();
-
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
+
       <Header
         page="products"
         user={user}
@@ -107,58 +105,53 @@ export default function Products() {
 
       <div className="flex p-4 gap-6 flex-1 overflow-hidden">
 
-        {/* LEFT CONTENT */}
+        {/* LEFT SIDE */}
         <div className="flex-1 overflow-y-auto p-2">
 
-          {/* Search + Sort */}
+          {/* SEARCH + SORT */}
           <div className="flex gap-3 mb-3 items-center">
-            <div className="relative w-4/5">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-              <input
-                type="text"
-                placeholder="Search Products"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="border p-2 pl-10 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Search Products"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border p-2 rounded w-4/5"
+            />
 
-            <div className="relative w-1/5">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">⬇️</span>
-              <select
-                className="border p-2 pl-8 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={`${sortBy}:${sortDirection}`}
-                onChange={(e) => {
-                  const [f, d] = e.target.value.split(":");
-                  setSortBy(f);
-                  setSortDirection(d);
-                  setPage(0);
-                }}
-              >
-                <option value="createdAt:DESC">Newest</option>
-                <option value="createdAt:ASC">Oldest</option>
-                <option value="name:ASC">Name A→Z</option>
-                <option value="name:DESC">Name Z→A</option>
-                <option value="sellingPrice:ASC">Price Low→High</option>
-                <option value="sellingPrice:DESC">Price High→Low</option>
-                <option value="stockBalance:ASC">Stock Low→High</option>
-                <option value="stockBalance:DESC">Stock High→Low</option>
-              </select>
-            </div>
+            <select
+              className="border p-2 rounded w-1/5"
+              value={`${sortBy}:${sortDirection}`}
+              onChange={(e) => {
+                const [f, d] = e.target.value.split(":");
+                setSortBy(f);
+                setSortDirection(d);
+                setPage(0);
+              }}
+            >
+              <option value="createdAt:DESC">Newest</option>
+              <option value="createdAt:ASC">Oldest</option>
+              <option value="name:ASC">Name A→Z</option>
+              <option value="name:DESC">Name Z→A</option>
+              <option value="sellingPrice:ASC">Price Low→High</option>
+              <option value="sellingPrice:DESC">Price High→Low</option>
+              <option value="stockBalance:ASC">Stock Low→High</option>
+              <option value="stockBalance:DESC">Stock High→Low</option>
+            </select>
           </div>
 
-          {loading && <p className="text-gray-500 mt-3">Loading...</p>}
+          {loading && <p className="text-gray-500">Loading...</p>}
 
           <div className="grid grid-cols-3 gap-4 mt-4">
             {products.map((prod) => (
               <ProductCard
-                key={prod.id ?? prod.barcode}
+                key={prod.barcode}
                 product={prod}
                 onAdd={() => handleAddToBasket(prod)}
               />
             ))}
           </div>
 
+          {/* PAGINATION */}
           <div className="flex gap-3 mt-4">
             <button
               disabled={page === 0}
@@ -177,7 +170,7 @@ export default function Products() {
           </div>
         </div>
 
-        {/* RIGHT: Basket */}
+        {/* RIGHT: BASKET */}
         <Basket
           basket={basket}
           onIncrease={handleIncrease}
@@ -190,7 +183,7 @@ export default function Products() {
       <AddProductModal
         open={openModal}
         onClose={() => setOpenModal(false)}
-        onSuccess={refreshAfterAdd}
+        onSuccess={fetchProducts}
       />
     </div>
   );
