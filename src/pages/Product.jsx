@@ -4,8 +4,11 @@ import ProductCard from "../components/ProductCard";
 import AddProductModal from "../components/AddProductModal";
 import Basket from "../components/Basket";
 import { getProducts } from "../api/product";
+import { sellProduts } from "../api/product";
 import { getUser } from "../api/user";
 import { toast } from "react-toastify";
+import { downloadLeftoverReport, downloadTransactionsReport } from "../api/report";
+
 
 export default function Products() {
   const [user, setUser] = useState({});
@@ -45,7 +48,7 @@ export default function Products() {
       setProducts(data.products || []);
       setTotalPages(data.totalPages || 0);
     } catch (e) {
-      toast.error("Failed to fetch products");
+      toast.error(e);
     }
     setLoading(false);
   };
@@ -89,9 +92,35 @@ export default function Products() {
     setBasket((prev) => prev.filter((p) => p.key !== product.key));
   };
 
-  const handleSell = () => {
-    alert("Sell clicked");
-  };
+    const handleSell = async () => {
+        if (basket.length === 0) {
+            toast.info("Basket is empty");
+            return;
+        }
+
+        try {
+            // Transform basket to ProductSellDto
+            const productsToSell = basket.map((p) => ({
+            externalId: p.id?.toString() || "", // or "" if no externalId
+            barcode: p.barcode,
+            quantity: p.count,
+            }));
+
+            await sellProduts(productsToSell);
+
+            toast.success("Products sold successfully");
+
+            // Empty basket
+            setBasket([]);
+            
+            // Refresh products stock
+            fetchProducts();
+        } catch (error) {
+            toast.error(error);
+            console.error(error);
+        }
+    };
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -100,7 +129,19 @@ export default function Products() {
         page="products"
         user={user}
         onAddProduct={() => setOpenModal(true)}
-        onReportClick={(type) => alert(`Report: ${type}`)}
+        onReportClick={
+            async (type) => {
+                try {
+                    if (type === "leftover") {
+                        await downloadLeftoverReport();
+                    } else if (type === "transactions") {
+                        await downloadTransactionsReport();
+                    }
+                } catch (e) {
+                    toast.error("Failed to download report");
+                }
+            }
+        }
       />
 
       <div className="flex p-4 gap-6 flex-1 overflow-hidden">

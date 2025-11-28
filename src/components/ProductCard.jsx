@@ -1,5 +1,4 @@
 export default function ProductCard({ product, onAdd }) {
-    console.log(product);
   return (
     <div className="bg-white p-4 rounded-xl shadow-md flex flex-col justify-between">
       <h3 className="font-semibold">{product.name}</h3>

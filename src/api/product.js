@@ -26,13 +26,30 @@ export const addProductsToStock = async (products) => {
     // ProductRequestDto:
     // name, barcode, unit, category, purchasedPrice, sellingPrice, stockBalance, photoUrl
     const res = await axiosInstance.post(
-      "/admin/inbound_document/add",
+      "/admin/inbound-document/add",
       products
     );
 
     return res.data;
   } catch (error) {
     console.error("Failed to add products to stock", error);
+    throw error;
+  }
+};
+
+export const sellProduts = async (products) => {
+  try {
+    // products MUST be an array of ProductRequestDto
+    // ProductRequestDto:
+    // name, barcode, unit, category, purchasedPrice, sellingPrice, stockBalance, photoUrl
+    const res = await axiosInstance.post(
+      "/outbound-document/sell",
+      products
+    );
+
+    return res.data;
+  } catch (error) {
+    console.error("Failed to sell products", error);
     throw error;
   }
 };
