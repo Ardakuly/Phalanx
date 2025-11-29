@@ -20,6 +20,17 @@ export const getProducts = async (filters = {}) => {
   return res.data;
 };
 
+export const getProductByBarcode = async (barcode) => {
+  const res = await axiosInstance.get(`/product/barcode/${barcode}`);
+  return res.data;
+};
+
+export const getProductByName = async (name) => {
+  const res = await axiosInstance.get(`/product/name/${name}`);
+  return res.data;
+};
+
+
 export const addProductsToStock = async (products) => {
   try {
     // products MUST be an array of ProductRequestDto

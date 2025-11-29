@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { addProductsToStock } from "../api/product";
+import { useRef, useState } from "react";
+import { addProductsToStock, getProductByBarcode, getProductByName } from "../api/product";
+import { toast } from "react-toastify";
 
 export default function AddProductModal({ open, onClose, onSuccess }) {
-  // Start with one product row
   const [products, setProducts] = useState([
     {
       name: "",
@@ -16,15 +16,66 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
     },
   ]);
 
+  // one debounce timer for search
+  const searchTimeoutRef = useRef(null);
+
+  const autoFillProduct = async (index, product) => {
+    try {
+      let existing = null;
+
+      if (product.name && product.name.length >= 3) {
+        existing = await getProductByName(product.name);
+      }
+
+      if (!existing) return;
+
+      setProducts((prev) =>
+        prev.map((p, i) =>
+          i === index
+            ? {
+                ...p,
+                // auto-filled from backend
+                name: existing.name,
+                barcode: existing.barcode,
+                unit: existing.unit,
+                category: existing.category.name,
+                photoUrl: existing.photoUrl ?? p.photoUrl,
+                // DO NOT override these:
+                // purchasedPrice: p.purchasedPrice,
+                // sellingPrice: p.sellingPrice,
+                // stockBalance: p.stockBalance,
+              }
+            : p
+        )
+      );
+
+      toast.info("Existing product found, fields filled");
+    } catch (e) {
+      // likely 404 – just means new product, do nothing
+      // console.log("No existing product found");
+    }
+  };
+
   const handleChange = (index, e) => {
+    const { name, value } = e.target;
+
     const newProducts = [...products];
-    newProducts[index][e.target.name] = e.target.value;
+    newProducts[index][name] = value;
     setProducts(newProducts);
+
+    // trigger auto-fill only when name/barcode change
+    if (name === "name" || name === "barcode") {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+      searchTimeoutRef.current = setTimeout(() => {
+        autoFillProduct(index, newProducts[index]);
+      }, 400); // debounce 400ms
+    }
   };
 
   const addProductRow = () => {
-    setProducts([
-      ...products,
+    setProducts((prev) => [
+      ...prev,
       {
         name: "",
         barcode: "",
@@ -39,7 +90,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
   };
 
   const removeProductRow = (index) => {
-    setProducts(products.filter((_, i) => i !== index));
+    setProducts((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {
@@ -56,9 +107,13 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
       }));
 
       await addProductsToStock(payload);
+      toast.success("Products added to stock");
+
       onSuccess(); // refresh product list
       onClose();   // close modal
-      setProducts([ // reset modal
+
+      // reset state
+      setProducts([
         {
           name: "",
           barcode: "",
@@ -71,12 +126,13 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
         },
       ]);
     } catch (error) {
-      alert("Error adding products");
+      toast.error("Error adding products");
     }
   };
 
   if (!open) return null;
 
+  // 🔻 YOUR ORIGINAL LAYOUT, unchanged except wired to enhanced logic
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
       <div className="bg-white rounded-xl p-6 w-[600px] max-h-[90vh] overflow-y-auto shadow-lg">
@@ -84,7 +140,6 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
         <h2 className="text-xl font-semibold mb-4">Add Products to Stock</h2>
 
         <div className="flex flex-col gap-4">
-
           {products.map((product, index) => (
             <div
               key={index}
@@ -180,7 +235,6 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
           >
             + Add Another Product
           </button>
-
         </div>
 
         {/* Buttons */}
