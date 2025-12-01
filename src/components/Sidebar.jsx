@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { HiMenu, HiX } from "react-icons/hi"; // menu icons
+import { HiMenu, HiX } from "react-icons/hi";
 
-export default function Sidebar() {
+export default function Sidebar({ user }) {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
 
+  const isEmployer = user?.role === "EMPLOYER";
+
   const links = [
     { name: "Products", path: "/products" },
-    { name: "Administration", path: "/admin" },
+    ...(isEmployer ? [{ name: "Administration", path: "/admin" }] : []), // 🔥 only employer sees
   ];
 
   return (
@@ -24,10 +26,11 @@ export default function Sidebar() {
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full bg-white shadow-lg transform transition-transform duration-300 z-40
-          ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 w-64`}
+        ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 w-64`}
       >
         <div className="p-6">
           <h2 className="text-xl font-bold mb-6">Phalanx POS</h2>
+
           <nav className="flex flex-col gap-3">
             {links.map((link) => (
               <Link
@@ -44,12 +47,11 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Overlay when sidebar is open on mobile */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black opacity-25 md:hidden z-30"
           onClick={() => setIsOpen(false)}
-        ></div>
+        />
       )}
     </>
   );
