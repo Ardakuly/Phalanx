@@ -30,7 +30,7 @@ export default function UserRow({ user, onUpdate }) {
           onClick={toggleRole}
           className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
-          Make {user.role === "EMPLOYER" ? "Employee" : "Employer"}
+          Сделать {user.role === "EMPLOYER" ? "Employee" : "Employer"}
         </button>
 
         <button
@@ -38,7 +38,7 @@ export default function UserRow({ user, onUpdate }) {
           className={`px-3 py-1 text-white rounded 
             ${user.enabled ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}`}
         >
-          {user.enabled ? "Disable" : "Enable"}
+          {user.enabled ? "Отключить" : "Включить"}
         </button>
 
       </td>

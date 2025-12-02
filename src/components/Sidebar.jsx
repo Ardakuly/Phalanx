@@ -9,8 +9,8 @@ export default function Sidebar({ user }) {
   const isEmployer = user?.role === "EMPLOYER";
 
   const links = [
-    { name: "Products", path: "/products" },
-    ...(isEmployer ? [{ name: "Administration", path: "/admin" }] : []), // 🔥 only employer sees
+    { name: "Продукты", path: "/products" },
+    ...(isEmployer ? [{ name: "Администрирование", path: "/admin" }] : []), // 🔥 only employer sees
   ];
 
   return (

@@ -25,10 +25,10 @@ export default function Register() {
     setLoading(true);
     try {
       await signUp(data);
-      toast.success("Registration successful! Please login.");
+      toast.success("Регистрация прошла успешно! Пожалуйста, войдите.");
       navigate("/login");
-    } catch (err) {
-      toast.error(err.message);
+    } catch (error) {
+      toast.error(error.response.data.error);
     } finally {
       setLoading(false);
     }
@@ -41,42 +41,42 @@ export default function Register() {
         className="bg-white p-8 rounded-2xl w-full max-w-md shadow-lg"
       >
         <h2 className="text-2xl font-semibold mb-6 text-center">
-          Create Account
+          Создать аккаунт
         </h2>
 
         <Input
-          label="First Name"
+          label="Имя"
           value={data.firstName}
           onChange={handleChange}
           name="firstName"
         />
         <Input
-          label="Last Name"
+          label="Фамилия"
           value={data.lastName}
           onChange={handleChange}
           name="lastName"
         />
         <Input
-          label="Email"
+          label="Почта"
           value={data.email}
           onChange={handleChange}
           name="email"
           type="email"
         />
         <Input
-          label="Password"
+          label="Пароль"
           value={data.password}
           onChange={handleChange}
           name="password"
           type="password"
         />
 
-        <Button type="submit">{loading ? "Registering..." : "Sign Up"}</Button>
+        <Button type="submit">{loading ? "Регистрация..." : "Зарегистрироваться"}</Button>
 
         <p className="text-center text-sm mt-4">
-          Already have an account?{" "}
+          Уже есть аккаунт?{" "}
           <Link to="/login" className="text-blue-600 hover:underline">
-            Log In
+            Войти
           </Link>
         </p>
       </form>

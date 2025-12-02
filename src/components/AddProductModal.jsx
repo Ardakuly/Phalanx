@@ -126,7 +126,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
         },
       ]);
     } catch (error) {
-      toast.error("Error adding products");
+      toast.error(error.response.data.error);
     }
   };
 
@@ -137,7 +137,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
       <div className="bg-white rounded-xl p-6 w-[600px] max-h-[90vh] overflow-y-auto shadow-lg">
 
-        <h2 className="text-xl font-semibold mb-4">Add Products to Stock</h2>
+        <h2 className="text-xl font-semibold mb-4">Добавить продукты на склад</h2>
 
         <div className="flex flex-col gap-4">
           {products.map((product, index) => (
@@ -158,7 +158,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
               <input
                 className="border p-2 rounded"
                 name="name"
-                placeholder="Name"
+                placeholder="Название"
                 value={product.name}
                 onChange={(e) => handleChange(index, e)}
               />
@@ -166,7 +166,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
               <input
                 className="border p-2 rounded"
                 name="barcode"
-                placeholder="Barcode"
+                placeholder="Штрихкод"
                 value={product.barcode}
                 onChange={(e) => handleChange(index, e)}
               />
@@ -177,17 +177,17 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
                 value={product.unit}
                 onChange={(e) => handleChange(index, e)}
               >
-                <option value="PIECE">Piece (шт)</option>
-                <option value="KILOGRAM">Kilogram (кг)</option>
-                <option value="GRAM">Gram (г)</option>
-                <option value="LITRE">Litre (л)</option>
-                <option value="METER">Meter (м)</option>
+                <option value="PIECE">Штук</option>
+                <option value="KILOGRAM">Килограмм</option>
+                <option value="GRAM">Грамм</option>
+                <option value="LITRE">Литр</option>
+                <option value="METER">Метр</option>
               </select>
 
               <input
                 className="border p-2 rounded"
                 name="category"
-                placeholder="Category"
+                placeholder="Категория"
                 value={product.category}
                 onChange={(e) => handleChange(index, e)}
               />
@@ -195,7 +195,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
               <input
                 className="border p-2 rounded"
                 name="purchasedPrice"
-                placeholder="Purchased Price"
+                placeholder="Закупочная цена"
                 type="number"
                 value={product.purchasedPrice}
                 onChange={(e) => handleChange(index, e)}
@@ -204,7 +204,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
               <input
                 className="border p-2 rounded"
                 name="sellingPrice"
-                placeholder="Selling Price"
+                placeholder="Цена продажи"
                 type="number"
                 value={product.sellingPrice}
                 onChange={(e) => handleChange(index, e)}
@@ -213,7 +213,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
               <input
                 className="border p-2 rounded"
                 name="stockBalance"
-                placeholder="Stock Balance"
+                placeholder="Остаток на складе"
                 type="number"
                 value={product.stockBalance}
                 onChange={(e) => handleChange(index, e)}
@@ -222,7 +222,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
               <input
                 className="border p-2 rounded"
                 name="photoUrl"
-                placeholder="Photo URL"
+                placeholder="Ссылка на фото"
                 value={product.photoUrl}
                 onChange={(e) => handleChange(index, e)}
               />
@@ -233,7 +233,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
             onClick={addProductRow}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            + Add Another Product
+            + Добавить другой продукт
           </button>
         </div>
 
@@ -243,13 +243,13 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
             className="px-4 py-2 bg-gray-400 text-white rounded"
             onClick={onClose}
           >
-            Cancel
+            Отмена
           </button>
           <button
             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             onClick={handleSubmit}
           >
-            Add All
+            Добавить все
           </button>
         </div>
 

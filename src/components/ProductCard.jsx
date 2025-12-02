@@ -6,9 +6,9 @@ export default function ProductCard({ product, onAdd }) {
       <p className="text-gray-500">{product.stockBalance} {product.unit}</p>
       <button
         onClick={onAdd}
-        className="mt-2 bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+        className="mt-2 bg-blue-600 text-white text-lg px-3 py-1 rounded-lg hover:bg-blue-700"
       >
-        Add to Basket
+        Добавить в корзину
       </button>
     </div>
   );

@@ -46,9 +46,10 @@ export default function Products() {
       const data = await getProducts(payload);
 
       setProducts(data.products || []);
+      console.log(data);
       setTotalPages(data.totalPages || 0);
-    } catch (e) {
-      toast.error(e);
+    } catch (error) {
+      toast.error(error.response.data.error);
     }
     setLoading(false);
   };
@@ -101,9 +102,9 @@ export default function Products() {
         try {
             // Transform basket to ProductSellDto
             const productsToSell = basket.map((p) => ({
-            externalId: p.id?.toString() || "", // or "" if no externalId
-            barcode: p.barcode,
-            quantity: p.count,
+                externalId: p.id?.toString() || "", // or "" if no externalId
+                barcode: p.barcode,
+                quantity: p.count,
             }));
 
             await sellProduts(productsToSell);
@@ -112,11 +113,10 @@ export default function Products() {
 
             // Empty basket
             setBasket([]);
-            
             // Refresh products stock
             fetchProducts();
         } catch (error) {
-            toast.error(error);
+            toast.error(error.response.data.error);
             console.error(error);
         }
     };
@@ -153,7 +153,7 @@ export default function Products() {
           <div className="flex gap-3 mb-3 items-center">
             <input
               type="text"
-              placeholder="Search Products"
+              placeholder="Поиск продуктов по имени и штрихкоду"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="border p-2 rounded w-4/5"
@@ -169,14 +169,15 @@ export default function Products() {
                 setPage(0);
               }}
             >
-              <option value="createdAt:DESC">Newest</option>
-              <option value="createdAt:ASC">Oldest</option>
-              <option value="name:ASC">Name A→Z</option>
-              <option value="name:DESC">Name Z→A</option>
-              <option value="sellingPrice:ASC">Price Low→High</option>
-              <option value="sellingPrice:DESC">Price High→Low</option>
-              <option value="stockBalance:ASC">Stock Low→High</option>
-              <option value="stockBalance:DESC">Stock High→Low</option>
+                <option value="createdAt:DESC">Новые</option>
+                <option value="createdAt:ASC">Старые</option>
+                <option value="name:ASC">Имя A→Z</option>
+                <option value="name:DESC">Имя Z→A</option>
+                <option value="sellingPrice:ASC">Цена: низкая→высокая</option>
+                <option value="sellingPrice:DESC">Цена: высокая→низкая</option>
+                <option value="stockBalance:ASC">Остаток: низкий→высокий</option>
+                <option value="stockBalance:DESC">Остаток: высокий→низкий</option>
+
             </select>
           </div>
 

@@ -19,12 +19,11 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await signIn(data);
-      console.log(response);
       localStorage.setItem("token", response.accessToken);
-      toast.success("Login successful!");
-      navigate("/products"); // replace with your dashboard route
-    } catch (err) {
-      toast.error(err.message);
+      toast.success("Вход выполнен успешно!");
+      navigate("/products");
+    } catch (error) {
+        toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -36,29 +35,29 @@ export default function Login() {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-2xl w-full max-w-md shadow-lg"
       >
-        <h2 className="text-2xl font-semibold mb-6 text-center">Log In</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-center">Войти</h2>
 
         <Input
-          label="Email"
+          label="Почта"
           value={data.email}
           onChange={handleChange}
           name="email"
           type="email"
         />
         <Input
-          label="Password"
+          label="Пароль"
           value={data.password}
           onChange={handleChange}
           name="password"
           type="password"
         />
 
-        <Button type="submit">{loading ? "Logging in..." : "Log In"}</Button>
+        <Button type="submit">{loading ? "Вход в систему..." : "Войти"}</Button>
 
         <p className="text-center text-sm mt-4">
-          Don't have an account?{" "}
+          Нет аккаунта?{" "}
           <Link to="/register" className="text-blue-600 hover:underline">
-            Create Account
+            Создать аккаунт
           </Link>
         </p>
       </form>

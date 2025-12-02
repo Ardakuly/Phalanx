@@ -5,12 +5,12 @@ export default function Basket({ basket, onIncrease, onDecrease, onRemove, onSel
     <div className="w-1/3 bg-white p-4 rounded-xl shadow-md flex flex-col 
                     h-[80vh] max-h-[80vh] overflow-hidden">  {/* << 80% screen */}
 
-      <h2 className="text-lg font-semibold mb-3">Basket</h2>
+      <h2 className="text-lg font-semibold mb-3">Корзина</h2>
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto mb-3 min-h-0">
         {basket.length === 0 && (
-          <p className="text-gray-500">No products added</p>
+          <p className="text-gray-500">Продукты не добавлены</p>
         )}
 
         {basket.map((item) => (
@@ -35,7 +35,7 @@ export default function Basket({ basket, onIncrease, onDecrease, onRemove, onSel
       {/* Bottom always visible */}
       <div className="border-t pt-3 shrink-0 bg-white">
         <div className="flex justify-between text-lg font-semibold mb-2">
-          <span>Total:</span>
+          <span>Итого:</span>
           <span>{total} ₸</span>
         </div>
 
@@ -44,7 +44,7 @@ export default function Basket({ basket, onIncrease, onDecrease, onRemove, onSel
           onClick={onSell}
           disabled={basket.length === 0}
         >
-          Sell
+          Продать
         </button>
       </div>
     </div>

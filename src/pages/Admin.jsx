@@ -34,16 +34,16 @@ export default function Admin() {
       <Header page="admin" user={user} />
 
       <div className="p-4">
-        <h2 className="text-xl font-semibold mb-4">User Management</h2>
+        <h2 className="text-xl font-semibold mb-4">Управление пользователями</h2>
 
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">Role</th>
-                <th className="px-4 py-2">Actions</th>
+                <th className="px-4 py-2">Название</th>
+                <th className="px-4 py-2">Почта</th>
+                <th className="px-4 py-2">Роль</th>
+                <th className="px-4 py-2">Действия</th>
               </tr>
             </thead>
             <tbody>

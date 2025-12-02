@@ -40,7 +40,7 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
               onClick={onAddProduct}
               className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
             >
-              Add Product
+              Добавить продукт
             </button>
 
             {/* REPORTS DROPDOWN */}
@@ -52,7 +52,7 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
                 }}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               >
-                Reports
+                Отчёты
               </button>
 
               {openReports && (
@@ -61,13 +61,13 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => onReportClick("leftover")}
                   >
-                    Leftover
+                    Остаток
                   </div>
                   <div
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => onReportClick("transactions")}
                   >
-                    Transactions
+                    Продажи
                   </div>
                 </div>
               )}
