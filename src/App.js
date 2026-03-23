@@ -4,33 +4,41 @@ import Admin from "./pages/Admin";
 import AppLayout from "./components/AppLayout";
 import Login from "./pages/Login";
 import Register from "./pages/Registration";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        <Route
-          path="/products"
-          element={
-            <AppLayout>
-              <Product />
-            </AppLayout>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <AppLayout>
-              <Admin />
-            </AppLayout>
-          }
-        />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Product />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AppLayout>
+                  <Admin />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="/" element={<Login />} />
-      </Routes>
+          <Route path="/" element={<Login />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

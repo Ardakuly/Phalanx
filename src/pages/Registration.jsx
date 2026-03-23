@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { signUp } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 
 import Input from "../components/Input";
 import Button from "../components/Button";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [data, setData] = useState({
     firstName: "",
     lastName: "",
@@ -24,11 +25,11 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      await signUp(data);
+      await register(data);
       toast.success("Регистрация прошла успешно! Пожалуйста, войдите.");
       navigate("/login");
     } catch (error) {
-      toast.error(error.response.data.error);
+      toast.error(error.response?.data?.error || error.message);
     } finally {
       setLoading(false);
     }

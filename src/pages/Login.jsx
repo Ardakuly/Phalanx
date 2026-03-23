@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { signIn } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 
 import Input from "../components/Input";
 import Button from "../components/Button";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [data, setData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -18,8 +19,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await signIn(data);
-      localStorage.setItem("token", response.accessToken);
+      await login(data);
       toast.success("Вход выполнен успешно!");
       navigate("/products");
     } catch (error) {
