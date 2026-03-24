@@ -33,15 +33,11 @@ export default function Products() {
     })();
   }, []);
 
-  // Fetch products
-  useEffect(() => {
-    fetchProducts();
-  }, [page, sortBy, sortDirection]);
-
+  // Fetch products (debounced)
   useEffect(() => {
     const timer = setTimeout(() => fetchProducts(), 300);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [page, sortBy, sortDirection, search]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -106,7 +102,7 @@ export default function Products() {
         try {
             // Transform basket to ProductSellDto
             const productsToSell = basket.map((p) => ({
-                externalId: p.id?.toString() || "", // or "" if no externalId
+                ...(p.id ? { externalId: p.id.toString() } : {}),
                 barcode: p.barcode,
                 quantity: p.count,
             }));
@@ -185,7 +181,17 @@ export default function Products() {
             </select>
           </div>
 
-          {loading && <p className="text-gray-500">Loading...</p>}
+          {loading && (
+            <div className="flex justify-center py-8">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+
+          {!loading && products.length === 0 && (
+            <div className="text-center py-10 bg-white rounded-xl shadow-md mt-4 text-gray-500">
+              <p className="text-lg">Продукты не найдены</p>
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-4 mt-4">
             {products.map((prod) => (

@@ -2,8 +2,7 @@ export default function Basket({ basket, onIncrease, onDecrease, onRemove, onSel
   const total = basket.reduce((acc, item) => acc + item.sellingPrice * item.count, 0);
 
   return (
-    <div className="w-1/3 bg-white p-4 rounded-xl shadow-md flex flex-col 
-                    h-[80vh] max-h-[80vh] overflow-hidden">  {/* << 80% screen */}
+    <div className="w-1/3 bg-white p-4 rounded-xl shadow-md flex flex-col h-full overflow-hidden">
 
       <h2 className="text-lg font-semibold mb-3">Корзина</h2>
 

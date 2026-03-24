@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaChevronDown } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function Header({ page, user, onAddProduct, onReportClick }) {
   const [openReports, setOpenReports] = useState(false);
@@ -18,9 +19,11 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/login";
+    navigate("/login");
   };
 
   const isEmployer = user?.role === "EMPLOYER";
@@ -50,9 +53,9 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
                   setOpenReports(prev => !prev);
                   setOpenProfile(false);
                 }}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
               >
-                Отчёты
+                Отчёты <FaChevronDown size={14} />
               </button>
 
               {openReports && (
@@ -78,15 +81,15 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
         {/* USER PROFILE + LOGOUT */}
         <div className="relative">
           <div
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80"
             onClick={() => {
               setOpenProfile(prev => !prev);
               setOpenReports(false);
             }}
           >
             <FaUserCircle size={26} className="text-gray-600" />
-            <p className="font-semibold text-gray-700">
-              {user.firstName} {user.lastName}
+            <p className="font-semibold text-gray-700 flex items-center gap-2">
+              {user.firstName} {user.lastName} <FaChevronDown size={14} className="text-gray-500" />
             </p>
           </div>
 

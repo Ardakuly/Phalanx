@@ -5,7 +5,7 @@ import UserRow from "../components/UserRow";
 import { useNavigate } from "react-router-dom";
 
 export default function Admin() {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
@@ -28,6 +28,14 @@ export default function Admin() {
   const handleUserUpdate = (email, updates) => {
     setUsers(prev => prev.map(u => u.email === email ? { ...u, ...updates } : u));
   };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-xl text-gray-500">Загрузка...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

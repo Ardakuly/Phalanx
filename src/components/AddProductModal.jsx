@@ -17,8 +17,25 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
     },
   ]);
 
-  // one debounce timer for search
-  const searchTimeoutRef = useRef(null);
+  // one debounce timer per row
+  const searchTimeoutsRef = useRef({});
+
+  const handleClose = () => {
+    setProducts([
+      {
+        rowId: Date.now(),
+        name: "",
+        barcode: "",
+        unit: "PIECE",
+        category: "",
+        purchasedPrice: "",
+        sellingPrice: "",
+        stockBalance: "",
+        photoUrl: "",
+      },
+    ]);
+    onClose();
+  };
 
   const autoFillProduct = async (index, product) => {
     try {
@@ -67,9 +84,9 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
 
     // trigger auto-fill only when name/barcode change
     if (name === "name" || name === "barcode") {
-      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      if (searchTimeoutsRef.current[index]) clearTimeout(searchTimeoutsRef.current[index]);
 
-      searchTimeoutRef.current = setTimeout(() => {
+      searchTimeoutsRef.current[index] = setTimeout(() => {
         autoFillProduct(index, newProducts[index]);
       }, 400); // debounce 400ms
     }
@@ -158,78 +175,103 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
                   ×
                 </button>
               )}
+              <div className="grid grid-cols-2 gap-3 mt-2 pr-4">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Название</label>
+                  <input
+                    className="border p-2 rounded w-full"
+                    name="name"
+                    placeholder="Название"
+                    value={product.name}
+                    onChange={(e) => handleChange(index, e)}
+                  />
+                </div>
 
-              <input
-                className="border p-2 rounded"
-                name="name"
-                placeholder="Название"
-                value={product.name}
-                onChange={(e) => handleChange(index, e)}
-              />
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Штрихкод</label>
+                  <input
+                    className="border p-2 rounded w-full"
+                    name="barcode"
+                    placeholder="Штрихкод"
+                    value={product.barcode}
+                    onChange={(e) => handleChange(index, e)}
+                  />
+                </div>
 
-              <input
-                className="border p-2 rounded"
-                name="barcode"
-                placeholder="Штрихкод"
-                value={product.barcode}
-                onChange={(e) => handleChange(index, e)}
-              />
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Ед. измерения</label>
+                  <select
+                    name="unit"
+                    className="border p-2 rounded w-full"
+                    value={product.unit}
+                    onChange={(e) => handleChange(index, e)}
+                  >
+                    <option value="PIECE">Штук</option>
+                    <option value="KILOGRAM">Килограмм</option>
+                    <option value="GRAM">Грамм</option>
+                    <option value="LITRE">Литр</option>
+                    <option value="METER">Метр</option>
+                  </select>
+                </div>
 
-              <select
-                name="unit"
-                className="border p-2 rounded"
-                value={product.unit}
-                onChange={(e) => handleChange(index, e)}
-              >
-                <option value="PIECE">Штук</option>
-                <option value="KILOGRAM">Килограмм</option>
-                <option value="GRAM">Грамм</option>
-                <option value="LITRE">Литр</option>
-                <option value="METER">Метр</option>
-              </select>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Категория</label>
+                  <input
+                    className="border p-2 rounded w-full"
+                    name="category"
+                    placeholder="Категория"
+                    value={product.category}
+                    onChange={(e) => handleChange(index, e)}
+                  />
+                </div>
 
-              <input
-                className="border p-2 rounded"
-                name="category"
-                placeholder="Категория"
-                value={product.category}
-                onChange={(e) => handleChange(index, e)}
-              />
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Закупочная цена (₸)</label>
+                  <input
+                    className="border p-2 rounded w-full"
+                    name="purchasedPrice"
+                    placeholder="0"
+                    type="number"
+                    value={product.purchasedPrice}
+                    onChange={(e) => handleChange(index, e)}
+                  />
+                </div>
 
-              <input
-                className="border p-2 rounded"
-                name="purchasedPrice"
-                placeholder="Закупочная цена"
-                type="number"
-                value={product.purchasedPrice}
-                onChange={(e) => handleChange(index, e)}
-              />
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Цена продажи (₸)</label>
+                  <input
+                    className="border p-2 rounded w-full"
+                    name="sellingPrice"
+                    placeholder="0"
+                    type="number"
+                    value={product.sellingPrice}
+                    onChange={(e) => handleChange(index, e)}
+                  />
+                </div>
 
-              <input
-                className="border p-2 rounded"
-                name="sellingPrice"
-                placeholder="Цена продажи"
-                type="number"
-                value={product.sellingPrice}
-                onChange={(e) => handleChange(index, e)}
-              />
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Остаток на складе</label>
+                  <input
+                    className="border p-2 rounded w-full"
+                    name="stockBalance"
+                    placeholder="0"
+                    type="number"
+                    value={product.stockBalance}
+                    onChange={(e) => handleChange(index, e)}
+                  />
+                </div>
 
-              <input
-                className="border p-2 rounded"
-                name="stockBalance"
-                placeholder="Остаток на складе"
-                type="number"
-                value={product.stockBalance}
-                onChange={(e) => handleChange(index, e)}
-              />
-
-              <input
-                className="border p-2 rounded"
-                name="photoUrl"
-                placeholder="Ссылка на фото"
-                value={product.photoUrl}
-                onChange={(e) => handleChange(index, e)}
-              />
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Ссылка на фото</label>
+                  <input
+                    className="border p-2 rounded w-full"
+                    name="photoUrl"
+                    placeholder="https://..."
+                    value={product.photoUrl}
+                    onChange={(e) => handleChange(index, e)}
+                  />
+                </div>
+              </div>
             </div>
           ))}
 
@@ -244,8 +286,8 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
         {/* Buttons */}
         <div className="flex justify-end gap-3 mt-5">
           <button
-            className="px-4 py-2 bg-gray-400 text-white rounded"
-            onClick={onClose}
+            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+            onClick={handleClose}
           >
             Отмена
           </button>
