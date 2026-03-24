@@ -7,6 +7,8 @@ import SortDropdown from "../components/SortDropdown";
 import { useAuth } from "../context/AuthContext";
 import { useProducts } from "../hooks/useProducts";
 import { useBasket } from "../hooks/useBasket";
+import { useBarcodeScanner } from "../hooks/useBarcodeScanner";
+import { getProductByBarcode } from "../api/product";
 import { toast } from "react-toastify";
 import { downloadLeftoverReport, downloadTransactionsReport } from "../api/report";
 
@@ -44,6 +46,27 @@ export default function Products() {
     handleRemove,
     handleSell,
   } = useBasket();
+
+  const handleBarcodeScanned = async (barcode) => {
+    try {
+      // First, try to find in already loaded products to save a network request
+      let productToAdd = products.find(p => p.barcode === barcode);
+
+      if (!productToAdd) {
+        // Not in current list, fetch from API
+        productToAdd = await getProductByBarcode(barcode);
+      }
+
+      if (productToAdd) {
+        handleAddToBasket(productToAdd);
+        toast.success(`Сканирован: ${productToAdd.name}`);
+      }
+    } catch (e) {
+      toast.error(`Продукт со штрихкодом ${barcode} не найден`);
+    }
+  };
+
+  useBarcodeScanner(handleBarcodeScanned);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
