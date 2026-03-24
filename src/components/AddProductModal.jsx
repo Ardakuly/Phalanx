@@ -166,15 +166,6 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
               key={product.rowId || index}
               className="border p-3 rounded flex flex-col gap-2 relative bg-gray-50"
             >
-              {products.length > 1 && (
-                <button
-                  onClick={() => removeProductRow(index)}
-                  className="absolute top-1 right-1 text-red-500 font-bold"
-                  title="Remove product"
-                >
-                  ×
-                </button>
-              )}
               <div className="grid grid-cols-2 gap-3 mt-2 pr-4">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Название</label>
@@ -272,6 +263,17 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
                   />
                 </div>
               </div>
+              
+              {products.length > 1 && (
+                <div className="flex justify-end mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => removeProductRow(index)}
+                    className="flex items-center gap-1 text-red-500 hover:text-red-700 font-medium transition-colors bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg"
+                  >
+                    <span className="text-xl leading-none">&times;</span> Удалить продукт
+                  </button>
+                </div>
+              )}
             </div>
           ))}
 

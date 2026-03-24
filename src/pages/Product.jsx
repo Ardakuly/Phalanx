@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { FaChevronDown } from "react-icons/fa";
 import Header from "../components/Header";
 import ProductCard from "../components/ProductCard";
 import AddProductModal from "../components/AddProductModal";
@@ -24,6 +25,31 @@ export default function Products() {
   const [sortDirection, setSortDirection] = useState("DESC");
 
   const [openModal, setOpenModal] = useState(false);
+  const [openSort, setOpenSort] = useState(false);
+  const sortRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (sortRef.current && !sortRef.current.contains(e.target)) {
+        setOpenSort(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const sortOptions = [
+    { value: "createdAt:DESC", label: "Новые" },
+    { value: "createdAt:ASC", label: "Старые" },
+    { value: "name:ASC", label: "Имя A→Z" },
+    { value: "name:DESC", label: "Имя Z→A" },
+    { value: "sellingPrice:ASC", label: "Цена: низкая→высокая" },
+    { value: "sellingPrice:DESC", label: "Цена: высокая→низкая" },
+    { value: "stockBalance:ASC", label: "Остаток: низкий→высокий" },
+    { value: "stockBalance:DESC", label: "Остаток: высокий→низкий" }
+  ];
+
+  const currentSortLabel = sortOptions.find(o => o.value === `${sortBy}:${sortDirection}`)?.label || "Новые";
 
   // Load user
   useEffect(() => {
@@ -159,26 +185,36 @@ export default function Products() {
               className="border p-2 rounded w-4/5"
             />
 
-            <select
-              className="border p-2 rounded w-1/5"
-              value={`${sortBy}:${sortDirection}`}
-              onChange={(e) => {
-                const [f, d] = e.target.value.split(":");
-                setSortBy(f);
-                setSortDirection(d);
-                setPage(0);
-              }}
-            >
-                <option value="createdAt:DESC">Новые</option>
-                <option value="createdAt:ASC">Старые</option>
-                <option value="name:ASC">Имя A→Z</option>
-                <option value="name:DESC">Имя Z→A</option>
-                <option value="sellingPrice:ASC">Цена: низкая→высокая</option>
-                <option value="sellingPrice:DESC">Цена: высокая→низкая</option>
-                <option value="stockBalance:ASC">Остаток: низкий→высокий</option>
-                <option value="stockBalance:DESC">Остаток: высокий→низкий</option>
+            <div className="relative w-1/4" ref={sortRef}>
+              <div 
+                onClick={() => setOpenSort(!openSort)}
+                className="border p-2 rounded w-full bg-white flex justify-between items-center cursor-pointer hover:border-blue-400 transition-colors"
+                style={{ height: '42px' }}
+              >
+                <span className="text-gray-700 truncate text-sm">{currentSortLabel}</span>
+                <FaChevronDown className="text-gray-400 shrink-0 ml-2" size={12}/>
+              </div>
 
-            </select>
+              {openSort && (
+                <div className="absolute z-10 w-[120%] right-0 mt-1 bg-white border rounded shadow-lg overflow-hidden">
+                  {sortOptions.map(opt => (
+                    <div 
+                      key={opt.value}
+                      className={`px-3 py-2 cursor-pointer text-sm hover:bg-blue-50 transition-colors ${opt.value === `${sortBy}:${sortDirection}` ? "bg-blue-100 font-medium text-blue-700" : "text-gray-700"}`}
+                      onClick={() => {
+                        const [f, d] = opt.value.split(":");
+                        setSortBy(f);
+                        setSortDirection(d);
+                        setPage(0);
+                        setOpenSort(false);
+                      }}
+                    >
+                      {opt.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {loading && (
