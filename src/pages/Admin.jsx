@@ -1,27 +1,21 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import { getUser, getUsers } from "../api/user";
+import { getUsers } from "../api/user";
 import UserRow from "../components/UserRow";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Admin() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [users, setUsers] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
-      const data = await getUser();
-      setUser(data);
-
-      // 🔥 block employee access
-      if (data.role !== "EMPLOYER") {
-        navigate("/products");      // redirect non-admin user
-        return;
+      try {
+        const list = await getUsers();
+        setUsers(list);
+      } catch (error) {
+        console.error("Failed to fetch users", error);
       }
-
-      const list = await getUsers();
-      setUsers(list);
     })();
   }, []);
 
