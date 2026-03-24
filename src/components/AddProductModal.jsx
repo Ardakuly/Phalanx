@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 export default function AddProductModal({ open, onClose, onSuccess }) {
   const [products, setProducts] = useState([
     {
+      rowId: Date.now(),
       name: "",
       barcode: "",
       unit: "PIECE",
@@ -29,8 +30,13 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
 
       if (!existing) return;
 
-      setProducts((prev) =>
-        prev.map((p, i) =>
+      setProducts((prev) => {
+        const currentProduct = prev[index];
+        // Discard autofill if user modified the name/barcode during the API request
+        if (!currentProduct || currentProduct.name !== product.name || currentProduct.barcode !== product.barcode) {
+          return prev;
+        }
+        return prev.map((p, i) =>
           i === index
             ? {
                 ...p,
@@ -40,14 +46,10 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
                 unit: existing.unit,
                 category: existing.category.name,
                 photoUrl: existing.photoUrl ?? p.photoUrl,
-                // DO NOT override these:
-                // purchasedPrice: p.purchasedPrice,
-                // sellingPrice: p.sellingPrice,
-                // stockBalance: p.stockBalance,
               }
             : p
-        )
-      );
+        );
+      });
 
       toast.info("Existing product found, fields filled");
     } catch (e) {
@@ -77,6 +79,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
     setProducts((prev) => [
       ...prev,
       {
+        rowId: Date.now() + Math.random(),
         name: "",
         barcode: "",
         unit: "PIECE",
@@ -100,9 +103,9 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
         barcode: p.barcode,
         unit: p.unit,
         category: p.category,
-        purchasedPrice: parseFloat(p.purchasedPrice),
-        sellingPrice: parseFloat(p.sellingPrice),
-        stockBalance: parseFloat(p.stockBalance),
+        purchasedPrice: parseFloat(p.purchasedPrice) || 0,
+        sellingPrice: parseFloat(p.sellingPrice) || 0,
+        stockBalance: parseFloat(p.stockBalance) || 0,
         photoUrl: p.photoUrl,
       }));
 
@@ -115,6 +118,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
       // reset state
       setProducts([
         {
+          rowId: Date.now(),
           name: "",
           barcode: "",
           unit: "PIECE",
@@ -142,7 +146,7 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
         <div className="flex flex-col gap-4">
           {products.map((product, index) => (
             <div
-              key={index}
+              key={product.rowId || index}
               className="border p-3 rounded flex flex-col gap-2 relative bg-gray-50"
             >
               {products.length > 1 && (

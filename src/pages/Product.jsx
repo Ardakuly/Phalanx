@@ -4,7 +4,7 @@ import ProductCard from "../components/ProductCard";
 import AddProductModal from "../components/AddProductModal";
 import Basket from "../components/Basket";
 import { getProducts } from "../api/product";
-import { sellProduts } from "../api/product";
+import { sellProducts } from "../api/product";
 import { getUser } from "../api/user";
 import { toast } from "react-toastify";
 import { downloadLeftoverReport, downloadTransactionsReport } from "../api/report";
@@ -35,9 +35,13 @@ export default function Products() {
 
   // Fetch products
   useEffect(() => {
+    fetchProducts();
+  }, [page, sortBy, sortDirection]);
+
+  useEffect(() => {
     const timer = setTimeout(() => fetchProducts(), 300);
     return () => clearTimeout(timer);
-  }, [search, page, sortBy, sortDirection]);
+  }, [search]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -54,9 +58,9 @@ export default function Products() {
     setLoading(false);
   };
 
-  // Add product to basket — using BARCODE as unique key
+  // Add product to basket
   const handleAddToBasket = (product) => {
-    const key = product.barcode; // barcode MUST be unique
+    const key = product.id || product.barcode || product.name;
 
     setBasket((prev) => {
       const existing = prev.find((p) => p.key === key);
@@ -107,7 +111,7 @@ export default function Products() {
                 quantity: p.count,
             }));
 
-            await sellProduts(productsToSell);
+            await sellProducts(productsToSell);
 
             toast.success("Products sold successfully");
 

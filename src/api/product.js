@@ -48,7 +48,7 @@ export const addProductsToStock = async (products) => {
   }
 };
 
-export const sellProduts = async (products) => {
+export const sellProducts = async (products) => {
   try {
     // products MUST be an array of ProductRequestDto
     // ProductRequestDto:
