@@ -4,12 +4,14 @@ export default function ProductCard({ product, onAdd }) {
       <h3 className="font-semibold">{product.name}</h3>
       <p className="text-gray-500">{product.sellingPrice} ₸</p>
       <p className="text-gray-500">{product.stockBalance} {product.unit}</p>
-      <button
-        onClick={onAdd}
-        className="mt-2 bg-blue-600 text-white text-lg px-3 py-1 rounded-lg hover:bg-blue-700"
-      >
-        Добавить в корзину
-      </button>
+      {onAdd && (
+        <button
+          onClick={onAdd}
+          className="mt-2 bg-blue-600 text-white text-lg px-3 py-1 rounded-lg hover:bg-blue-700"
+        >
+          Добавить в корзину
+        </button>
+      )}
     </div>
   );
 }

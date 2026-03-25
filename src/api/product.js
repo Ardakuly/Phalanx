@@ -64,3 +64,8 @@ export const sellProducts = async (products) => {
     throw error;
   }
 };
+
+export const getLeftovers = async (threshold) => {
+  const res = await axiosInstance.get(`/product/leftover/${threshold}`);
+  return res.data;
+};

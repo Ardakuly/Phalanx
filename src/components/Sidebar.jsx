@@ -10,7 +10,10 @@ export default function Sidebar({ user }) {
 
   const links = [
     { name: "Продукты", path: "/products" },
-    ...(isEmployer ? [{ name: "Администрирование", path: "/admin" }] : []), // 🔥 only employer sees
+    ...(isEmployer ? [
+      { name: "Заканчивающиеся товары", path: "/leftovers" },
+      { name: "Администрирование", path: "/admin" }
+    ] : []), // 🔥 only employer sees
   ];
 
   return (
