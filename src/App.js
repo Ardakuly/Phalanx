@@ -8,47 +8,62 @@ import Register from "./pages/Registration";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 
+import { InventarizationProvider } from "./context/InventarizationContext";
+import Inventarization from "./pages/Inventarization";
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        <InventarizationProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          <Route
-            path="/products"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Product />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/leftovers"
-            element={
-              <ProtectedRoute requireAdmin={true}>
-                <AppLayout>
-                  <Leftover />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requireAdmin={true}>
-                <AppLayout>
-                  <Admin />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/products"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Product />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/leftovers"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AppLayout>
+                    <Leftover />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AppLayout>
+                    <Admin />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inventarization"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AppLayout>
+                    <Inventarization />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
 
-          <Route path="/" element={<Login />} />
-        </Routes>
+            <Route path="/" element={<Login />} />
+          </Routes>
+        </InventarizationProvider>
       </AuthProvider>
     </BrowserRouter>
   );

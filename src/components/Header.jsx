@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaChevronDown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useInventarization } from "../context/InventarizationContext";
+import FrozenStockBadge from "./FrozenStockBadge";
 
 export default function Header({ page, user, onAddProduct, onReportClick }) {
   const [openReports, setOpenReports] = useState(false);
@@ -20,6 +22,7 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
   }, []);
 
   const navigate = useNavigate();
+  const { isStockFrozen } = useInventarization();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -31,7 +34,10 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
   return (
     <div className="flex justify-between items-center p-4 bg-white shadow-md" ref={ref}>
 
-      <h1 className="text-xl font-semibold text-gray-700">Point-of-Sale</h1>
+      <div className="flex items-center gap-4">
+        <h1 className="text-xl font-semibold text-gray-700">Point-of-Sale</h1>
+        <FrozenStockBadge />
+      </div>
 
       <div className="flex items-center gap-6">
 
@@ -41,7 +47,10 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
 
             <button
               onClick={onAddProduct}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+              disabled={isStockFrozen}
+              className={`text-white px-4 py-2 rounded-lg ${
+                isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+              }`}
             >
               Добавить продукт
             </button>

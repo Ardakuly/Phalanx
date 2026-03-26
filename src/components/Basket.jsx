@@ -1,5 +1,19 @@
+import React, { useState } from "react";
+import { useInventarization } from "../context/InventarizationContext";
+import FrozenStockModal from "./FrozenStockModal";
+
 export default function Basket({ basket, onIncrease, onDecrease, onRemove, onSell }) {
   const total = basket.reduce((acc, item) => acc + item.sellingPrice * item.count, 0);
+  const { isStockFrozen } = useInventarization();
+  const [showFrozenModal, setShowFrozenModal] = useState(false);
+
+  const handleSellClick = () => {
+    if (isStockFrozen) {
+      setShowFrozenModal(true);
+      return;
+    }
+    onSell();
+  };
 
   return (
     <div className="w-1/3 bg-white p-4 rounded-xl shadow-md flex flex-col h-full overflow-hidden">
@@ -40,11 +54,16 @@ export default function Basket({ basket, onIncrease, onDecrease, onRemove, onSel
 
         <button
           className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium"
-          onClick={onSell}
+          onClick={handleSellClick}
           disabled={basket.length === 0}
         >
           Продать
         </button>
+
+        <FrozenStockModal 
+            isOpen={showFrozenModal} 
+            onClose={() => setShowFrozenModal(false)} 
+        />
       </div>
     </div>
   );

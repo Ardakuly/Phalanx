@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
-import { addProductsToStock, getProductByBarcode, getProductByName } from "../api/product";
+import { addProductsToStock, getProductByName } from "../api/product";
+import { useInventarization } from "../context/InventarizationContext";
 import { toast } from "react-toastify";
 import ProductFormRow from "./ProductFormRow";
 
 export default function AddProductModal({ open, onClose, onSuccess }) {
+  const { isStockFrozen } = useInventarization();
   const [products, setProducts] = useState([
     {
       rowId: Date.now(),
@@ -175,7 +177,10 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
 
           <button
             onClick={addProductRow}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            disabled={isStockFrozen}
+            className={`px-4 py-2 text-white rounded ${
+                isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+            }`}
           >
             + Добавить другой продукт
           </button>
@@ -190,8 +195,11 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
             Отмена
           </button>
           <button
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className={`px-4 py-2 text-white rounded ${
+                isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+            }`}
             onClick={handleSubmit}
+            disabled={isStockFrozen}
           >
             Добавить все
           </button>

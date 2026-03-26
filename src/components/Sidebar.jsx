@@ -12,7 +12,8 @@ export default function Sidebar({ user }) {
     { name: "Продукты", path: "/products" },
     ...(isEmployer ? [
       { name: "Заканчивающиеся товары", path: "/leftovers" },
-      { name: "Администрирование", path: "/admin" }
+      { name: "Администрирование", path: "/admin" },
+      { name: "Инвентаризация", path: "/inventarization" }
     ] : []), // 🔥 only employer sees
   ];
 
