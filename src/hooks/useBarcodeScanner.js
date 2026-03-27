@@ -11,7 +11,7 @@ export function useBarcodeScanner(onScan) {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Ignore if user is typing in an input
+      // Ignore scanning if focus is in an input field
       if (document.activeElement) {
         const tagName = document.activeElement.tagName.toLowerCase();
         if (tagName === "input" || tagName === "textarea" || tagName === "select") {
@@ -27,6 +27,7 @@ export function useBarcodeScanner(onScan) {
         return;
       }
 
+      // Ignore non-character keys
       if (e.key.length !== 1) {
         return;
       }
@@ -37,10 +38,10 @@ export function useBarcodeScanner(onScan) {
         clearTimeout(timeoutRef.current);
       }
       
-      // Clear buffer after a short timeout (e.g. 100ms) because scanners are very fast
+      // Clear buffer after 200ms of inactivity (supports slower scanners)
       timeoutRef.current = setTimeout(() => {
         barcodeBuffer.current = "";
-      }, 100); 
+      }, 200); 
     };
 
     document.addEventListener('keydown', handleKeyDown);

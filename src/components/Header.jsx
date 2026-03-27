@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaChevronDown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useInventarization } from "../context/InventarizationContext";
+import { useAuth } from "../context/AuthContext";
 import FrozenStockBadge from "./FrozenStockBadge";
 
 export default function Header({ page, user, onAddProduct, onReportClick }) {
@@ -22,10 +23,11 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
   }, []);
 
   const navigate = useNavigate();
-  const { isStockFrozen } = useInventarization();
+  const { isStockFrozen, loading: inventarizationLoading } = useInventarization();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     navigate("/login");
   };
 
@@ -47,9 +49,9 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
 
             <button
               onClick={onAddProduct}
-              disabled={isStockFrozen}
+              disabled={inventarizationLoading || isStockFrozen}
               className={`text-white px-4 py-2 rounded-lg ${
-                isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+                inventarizationLoading || isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
               }`}
             >
               Добавить продукт

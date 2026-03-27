@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { signIn, signUp } from "../api/auth";
 import { getUser } from "../api/user";
 
@@ -10,16 +10,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
+  const logout = useCallback(() => {
+    localStorage.removeItem("token");
+    setUser(null);
   }, []);
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const userData = await getUser();
       setUser(userData);
@@ -29,7 +25,16 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [logout]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchUser();
+    } else {
+      setLoading(false);
+    }
+  }, [fetchUser]);
 
   const login = async (credentials) => {
     const response = await signIn(credentials);
@@ -41,10 +46,6 @@ export const AuthProvider = ({ children }) => {
     await signUp(userData);
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-  };
 
   const value = {
     user,

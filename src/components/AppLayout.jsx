@@ -1,19 +1,15 @@
-import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
-import { getUser } from "../api/user";
+import { useAuth } from "../context/AuthContext";
 
 export default function AppLayout({ children }) {
-  const [user, setUser] = useState(null);
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    (async () => {
-      const data = await getUser();
-      setUser(data);
-    })();
-  }, []);
-
-  if (!user) return null;
+  if (loading || !user) return (
+    <div className="flex h-screen items-center justify-center bg-gray-50">
+      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
 
   return (
         <div className="flex min-h-screen">

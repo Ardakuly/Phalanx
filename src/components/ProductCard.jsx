@@ -1,7 +1,7 @@
 import { useInventarization } from "../context/InventarizationContext";
 
 export default function ProductCard({ product, onAdd }) {
-  const { isStockFrozen } = useInventarization();
+  const { isStockFrozen, loading } = useInventarization();
   return (
     <div className="bg-white p-4 rounded-xl shadow-md flex flex-col justify-between">
       <h3 className="font-semibold">{product.name}</h3>
@@ -10,9 +10,9 @@ export default function ProductCard({ product, onAdd }) {
       {onAdd && (
         <button
           onClick={onAdd}
-          disabled={isStockFrozen}
+          disabled={loading || isStockFrozen}
           className={`mt-2 text-white text-lg px-3 py-1 rounded-lg ${
-            isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+            loading || isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
           Добавить в корзину

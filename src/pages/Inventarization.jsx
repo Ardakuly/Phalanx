@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { 
-  startInventarization, 
-  updateCount, 
-  completeInventarization 
+import React, { useState, useEffect, memo } from "react";
+import {
+  startInventarization,
+  updateCount,
+  completeInventarization
 } from "../api/inventarization";
 import { useInventarization } from "../context/InventarizationContext";
 import { toast } from "react-toastify";
-import { 
-  ClipboardList, 
-  Play, 
-  CheckCircle, 
-  AlertCircle, 
-  Search, 
+import {
+  ClipboardList,
+  Play,
+  CheckCircle,
+  AlertCircle,
+  Search,
   Save,
   Loader2,
   ChevronRight,
@@ -19,15 +19,69 @@ import {
 } from "lucide-react";
 import { useBarcodeScanner } from "../hooks/useBarcodeScanner";
 
+const InventarizationRow = memo(({ item, savingId, onUpdate }) => {
+  const isCounted = item.countedQuantity !== null && item.countedQuantity !== undefined;
+  const hasDiscrepancy = isCounted && item.countedQuantity !== item.expectedQuantity;
+
+  return (
+    <tr
+      className={`transition-colors ${hasDiscrepancy ? "bg-red-50/70 hover:bg-red-100/70" : "hover:bg-blue-50/30"}`}
+    >
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-3">
+          {hasDiscrepancy && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" title="Расхождение" />}
+          <div>
+            <p className="font-bold text-gray-800">{item.productName}</p>
+            <p className="text-xs text-gray-500 font-mono mt-0.5">{item.barcode}</p>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4 text-center">
+        <span className="text-lg font-mono text-gray-600 font-semibold">{item.expectedQuantity}</span>
+      </td>
+      <td className="px-6 py-4 text-center">
+        <div className="inline-flex items-center gap-3">
+          <input
+            type="number"
+            className="w-24 text-center border-2 border-gray-200 rounded-lg py-1.5 font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
+            value={item.countedQuantity ?? ""}
+            onChange={(e) => {
+              const val = e.target.value === "" ? null : parseFloat(e.target.value);
+              onUpdate(item.productId, val, false);
+            }}
+            onBlur={(e) => {
+              if (e.target.value !== "") {
+                onUpdate(item.productId, parseFloat(e.target.value) || 0, true);
+              }
+            }}
+          />
+        </div>
+      </td>
+      <td className="px-6 py-4 text-right">
+        {savingId === item.productId ? (
+          <span className="inline-flex items-center gap-2 text-blue-500 text-xs font-bold">
+            <Loader2 size={14} className="animate-spin" /> Сохранение
+          </span>
+        ) : isCounted ? (
+          <span className="inline-flex items-center gap-1 text-green-500 text-xs font-bold">
+            <Save size={14} /> Сохранено
+          </span>
+        ) : (
+          <span className="text-gray-300 text-xs font-medium uppercase italic">Ожидает</span>
+        )}
+      </td>
+    </tr>
+  );
+});
+
 export default function Inventarization() {
-  const { activeInventarization, setActiveInventarization, fetchActiveInventarization } = useInventarization();
+  const { activeInventarization, setActiveInventarization, loading: contextLoading } = useInventarization();
   const [loading, setLoading] = useState(false);
   const [completeData, setCompleteData] = useState(null);
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [savingId, setSavingId] = useState(null);
 
-  // Sync items when active inventarization changes
   useEffect(() => {
     if (activeInventarization) {
       setItems(activeInventarization.items || []);
@@ -44,50 +98,63 @@ export default function Inventarization() {
       toast.success("Инвентаризация началась!");
     } catch (e) {
       toast.error(e.response?.data?.error || "Не удалось начать инвентаризацию");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  const handleUpdateCount = async (productId, quantity) => {
+  const handleUpdate = async (productId, quantity, persist = true) => {
     if (!activeInventarization) return;
-    
+
+    if (!persist) {
+      setItems(prev =>
+        prev.map(item =>
+          item.productId === productId ? { ...item, countedQuantity: quantity } : item
+        )
+      );
+      return;
+    }
+
+    const prevItems = items;
     setSavingId(productId);
     try {
       await updateCount(activeInventarization.id, productId, quantity);
-      
-      // Update local state
-      setItems(prev => prev.map(item => 
-        item.productId === productId ? { ...item, countedQuantity: quantity } : item
-      ));
     } catch (e) {
-      toast.error("Не удалось сохранить количество");
+      toast.error("Не удалось сохранить количество — изменения отменены");
+      setItems(prevItems);
+    } finally {
+      setSavingId(null);
     }
-    setSavingId(null);
   };
 
   const handleComplete = async () => {
     if (!window.confirm("Вы уверены, что хотите завершить инвентаризацию? Это разморозит товары.")) return;
-    
+
     setLoading(true);
     try {
       const data = await completeInventarization(activeInventarization.id);
       setCompleteData(data);
-      setActiveInventarization(null); // This will transition UI to summary
+      setActiveInventarization(null);
       toast.success("Инвентаризация завершена!");
     } catch (e) {
       toast.error(e.response?.data?.error || "Не удалось завершить инвентаризацию");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  // Barcode scanner support
   const handleBarcodeScanned = (barcode) => {
     const item = items.find(i => i.barcode === barcode);
     if (item) {
-      const newQty = (item.countedQuantity || 0) + 1;
-      handleUpdateCount(item.productId, newQty);
+      const newQty = (item.countedQuantity ?? 0) + 1;
+      // Scanned logic always persists
+      handleUpdate(item.productId, newQty, true);
+      // Also update local state for UI responsiveness if handleUpdate doesn't do it before persist
+      setItems(prev =>
+        prev.map(p => p.productId === item.productId ? { ...p, countedQuantity: newQty } : p)
+      );
       toast.success(`Сканировано: ${item.productName}`);
-      setSearch(""); // Clear search to show the scanned item
+      setSearch("");
     } else {
       toast.warn(`Товар со штрихкодом ${barcode} не найден в этом списке`);
     }
@@ -96,19 +163,26 @@ export default function Inventarization() {
 
   const filteredItems = items.filter(item => {
     const searchLower = search.toLowerCase();
-    return (
-        item.productName.toLowerCase().includes(searchLower) || 
-        (item.barcode && String(item.barcode).includes(search))
-    );
+    const barcodeMatch = item.barcode && String(item.barcode).includes(search);
+    const nameMatch = item.productName.toLowerCase().includes(searchLower);
+    return nameMatch || barcodeMatch;
   });
 
-  // RENDERING SCREENS
-  
-  // 1. START SCREEN
+  if (contextLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-500 font-medium">Загрузка данных об инвентаризации...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!activeInventarization && !completeData) {
     return (
       <div className="p-8 max-w-4xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-xl p-12 text-center border border-gray-100 italic-gradient">
+        <div className="bg-white rounded-3xl shadow-xl p-12 text-center border border-gray-100">
           <div className="bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8">
             <ClipboardList size={48} className="text-blue-600" />
           </div>
@@ -130,7 +204,6 @@ export default function Inventarization() {
     );
   }
 
-  // 2. COUNTING SCREEN
   if (activeInventarization) {
     return (
       <div className="p-6 h-full flex flex-col bg-gray-50">
@@ -182,72 +255,26 @@ export default function Inventarization() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredItems.map(item => {
-                  const hasDiscrepancy = item.countedQuantity !== undefined && item.countedQuantity !== item.expectedQuantity;
-                  
-                  return (
-                    <tr 
-                      key={item.productId} 
-                      className={`transition-colors ${hasDiscrepancy ? "bg-red-50/70 hover:bg-red-100/70" : "hover:bg-blue-50/30"}`}
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          {hasDiscrepancy && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" title="Расхождение" />}
-                          <div>
-                            <p className="font-bold text-gray-800">{item.productName}</p>
-                            <p className="text-xs text-gray-500 font-mono mt-0.5">{item.barcode}</p>
-                          </div>
-                        </div>
-                      </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="text-lg font-mono text-gray-600 font-semibold">{item.expectedQuantity}</span>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="inline-flex items-center gap-3">
-                        <input
-                          type="number"
-                          className="w-24 text-center border-2 border-gray-200 rounded-lg py-1.5 font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
-                          value={item.countedQuantity || ""}
-                          onChange={(e) => {
-                            const val = parseFloat(e.target.value) || 0;
-                            // Update locally first for snappiness
-                            setItems(prev => prev.map(p => p.productId === item.productId ? { ...p, countedQuantity: val } : p));
-                          }}
-                          onBlur={(e) => {
-                            const val = parseFloat(e.target.value) || 0;
-                            handleUpdateCount(item.productId, val);
-                          }}
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      {savingId === item.productId ? (
-                        <span className="inline-flex items-center gap-2 text-blue-500 text-xs font-bold">
-                          <Loader2 size={14} className="animate-spin" /> Сохранение
-                        </span>
-                      ) : item.countedQuantity !== undefined ? (
-                         <span className="inline-flex items-center gap-1 text-green-500 text-xs font-bold">
-                           <Save size={14} /> Сохранено
-                         </span>
-                      ) : (
-                        <span className="text-gray-300 text-xs font-medium uppercase italic">Ожидает</span>
-                      )}
-                    </td>
-                    </tr>
-                  );
-                })}
+                {filteredItems.map(item => (
+                  <InventarizationRow
+                    key={item.productId}
+                    item={item}
+                    savingId={savingId}
+                    onUpdate={handleUpdate}
+                  />
+                ))}
               </tbody>
             </table>
           </div>
-          
+
           <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
             <p className="text-sm text-gray-500 font-medium">
-                Показано <span className="text-gray-900 font-bold">{filteredItems.length}</span> из <span className="text-gray-900 font-bold">{items.length}</span> товаров
+              Показано <span className="text-gray-900 font-bold">{filteredItems.length}</span> из <span className="text-gray-900 font-bold">{items.length}</span> товаров
             </p>
             <div className="flex gap-4 items-center">
-                <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-                    <div className="w-3 h-3 bg-red-100 rounded-sm"></div> Найдено расхождение
-                </div>
+              <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
+                <div className="w-3 h-3 bg-red-100 rounded-sm"></div> Найдено расхождение
+              </div>
             </div>
           </div>
         </div>
@@ -255,88 +282,97 @@ export default function Inventarization() {
     );
   }
 
-  // 3. SUMMARY SCREEN
   if (completeData) {
-    const discrepancies = completeData.discrepancies || [];
-    
+    const allItems = completeData.items || [];
+    const discrepancies = allItems.filter(item => {
+      const counted = item.countedQuantity ?? item.expectedQuantity;
+      return counted !== item.expectedQuantity;
+    });
+
     return (
       <div className="p-6 max-w-5xl mx-auto h-full flex flex-col">
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 mb-6">
-            <div className="bg-green-600 p-8 text-white flex justify-between items-center">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <CheckCircle size={32} />
-                        <h1 className="text-3xl font-extrabold tracking-tight">Инвентаризация завершена</h1>
-                    </div>
-                    <p className="opacity-90 font-medium">ID Инвентаризации: #{completeData.id} • Склад обновлен, товары разморожены.</p>
-                </div>
-                <button 
-                  onClick={() => setCompleteData(null)}
-                  className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl font-bold backdrop-blur-md transition-all border border-white/20"
-                >
-                    Вернуться в начало
-                </button>
+          <div className="bg-green-600 p-8 text-white flex justify-between items-center">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <CheckCircle size={32} />
+                <h1 className="text-3xl font-extrabold tracking-tight">Инвентаризация завершена</h1>
+              </div>
+              <p className="opacity-90 font-medium">ID Инвентаризации: #{completeData.id} • Склад обновлен, товары разморожены.</p>
             </div>
+            <button
+              onClick={() => setCompleteData(null)}
+              className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl font-bold backdrop-blur-md transition-all border border-white/20"
+            >
+              Вернуться в начало
+            </button>
+          </div>
 
-            <div className="p-8 grid grid-cols-3 gap-6">
-                <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                    <p className="text-sm text-gray-500 font-bold uppercase tracking-wider mb-2">Всего товаров</p>
-                    <p className="text-3xl font-black text-gray-900">{completeData.items?.length || 0}</p>
-                </div>
-                <div className="bg-red-50 p-6 rounded-2xl border border-red-100">
-                    <p className="text-sm text-red-500 font-bold uppercase tracking-wider mb-2">Расхождения</p>
-                    <p className="text-3xl font-black text-red-700">{discrepancies.length}</p>
-                </div>
-                <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                    <p className="text-sm text-blue-500 font-bold uppercase tracking-wider mb-2">Провел</p>
-                    <p className="text-3xl font-black text-blue-700 truncate">{completeData.conductedBy || "Система"}</p>
-                </div>
+          <div className="p-8 grid grid-cols-3 gap-6">
+            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+              <p className="text-sm text-gray-500 font-bold uppercase tracking-wider mb-2">Всего товаров</p>
+              <p className="text-3xl font-black text-gray-900">{allItems.length}</p>
             </div>
-            
-            <div className="px-8 pb-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <AlertCircle className="text-amber-500" />
-                    Расхождения по товарам
-                </h2>
-                
-                <div className="border border-gray-200 rounded-2xl overflow-hidden">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Товар</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Ожидаемое</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Фактическое</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Разница</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {completeData.items?.map(item => {
-                                const diff = item.countedQuantity - item.expectedQuantity;
-                                const hasDiff = diff !== 0;
-                                
-                                return (
-                                    <tr key={item.productId} className={hasDiff ? "bg-amber-50/30" : ""}>
-                                        <td className="px-6 py-4">
-                                            <p className="font-bold text-gray-800">{item.productName}</p>
-                                        </td>
-                                        <td className="px-6 py-4 text-center font-mono text-gray-600">{item.expectedQuantity}</td>
-                                        <td className="px-6 py-4 text-center font-mono text-gray-800 font-bold">{item.countedQuantity}</td>
-                                        <td className="px-6 py-4 text-right">
-                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-black ${
-                                                diff > 0 ? "bg-green-100 text-green-700" : 
-                                                diff < 0 ? "bg-red-100 text-red-700" : 
-                                                "bg-gray-100 text-gray-500"
-                                            }`}>
-                                                {diff > 0 ? `+${diff}` : diff}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+            <div className="bg-red-50 p-6 rounded-2xl border border-red-100">
+              <p className="text-sm text-red-500 font-bold uppercase tracking-wider mb-2">Расхождения</p>
+              <p className="text-3xl font-black text-red-700">{discrepancies.length}</p>
             </div>
+            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+              <p className="text-sm text-blue-500 font-bold uppercase tracking-wider mb-2">Провел</p>
+              <p className="text-3xl font-black text-blue-700 truncate">{completeData.conductedBy || "Система"}</p>
+            </div>
+          </div>
+
+          <div className="px-8 pb-8">
+            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <AlertCircle className="text-amber-500" />
+              Расхождения по товарам {discrepancies.length === 0 && <span className="text-sm text-green-600 font-medium">— расхождений нет</span>}
+            </h2>
+
+            {discrepancies.length === 0 ? (
+              <div className="text-center py-12 bg-green-50 rounded-2xl border border-green-100">
+                <CheckCircle size={40} className="text-green-500 mx-auto mb-3" />
+                <p className="text-green-700 font-bold text-lg">Все позиции совпадают!</p>
+                <p className="text-green-600 text-sm mt-1">Фактический остаток соответствует ожидаемому.</p>
+              </div>
+            ) : (
+              <div className="border border-gray-200 rounded-2xl overflow-hidden">
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Товар</th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Ожидаемое</th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Фактическое</th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Разница</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {discrepancies.map(item => {
+                      const counted = item.countedQuantity ?? item.expectedQuantity;
+                      const diff = counted - item.expectedQuantity;
+
+                      return (
+                        <tr key={item.productId} className="bg-amber-50/30">
+                          <td className="px-6 py-4">
+                            <p className="font-bold text-gray-800">{item.productName}</p>
+                          </td>
+                          <td className="px-6 py-4 text-center font-mono text-gray-600">{item.expectedQuantity}</td>
+                          <td className="px-6 py-4 text-center font-mono text-gray-800 font-bold">{counted}</td>
+                          <td className="px-6 py-4 text-right">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-black ${diff > 0 ? "bg-green-100 text-green-700" :
+                              "bg-red-100 text-red-700"
+                              }`}>
+                              {diff > 0 ? `+${diff}` : diff}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
