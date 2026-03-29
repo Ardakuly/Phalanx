@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import { useAuth } from "../context/AuthContext";
 import { useOutboundDocuments } from "../hooks/useOutboundDocuments";
-import { FaChevronDown, FaChevronUp, FaSearch, FaFilter, FaCalendarAlt, FaUndo } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaSearch, FaCalendarAlt, FaUndo } from "react-icons/fa";
 import GoodReturnModal from "../components/GoodReturnModal";
+import { translateUnit } from "../utils/unitTranslations";
 
 
 const formatDate = (dateString) => {
@@ -233,7 +234,7 @@ export default function Receipts() {
                                       <div className="text-xs uppercase">{good.sku}</div>
                                       <div className="text-[10px] text-gray-400">{good.barcode}</div>
                                     </td>
-                                    <td className="px-4 py-3 text-center">{good.quantity} {good.unit}</td>
+                                    <td className="px-4 py-3 text-center">{good.quantity} {translateUnit(good.unit)}</td>
                                     <td className="px-4 py-3 text-right">{good.sellingPrice?.toLocaleString()} ₸</td>
                                     <td className="px-4 py-3 text-right font-medium">{(good.sellingPrice * good.quantity)?.toLocaleString()} ₸</td>
                                   </tr>

@@ -1,4 +1,5 @@
 import { useInventarization } from "../context/InventarizationContext";
+import { translateUnit } from "../utils/unitTranslations";
 
 export default function ProductCard({ product, onAdd }) {
   const { isStockFrozen, loading } = useInventarization();
@@ -6,7 +7,7 @@ export default function ProductCard({ product, onAdd }) {
     <div className="bg-white p-4 rounded-xl shadow-md flex flex-col justify-between">
       <h3 className="font-semibold">{product.name}</h3>
       <p className="text-gray-500">{product.sellingPrice} ₸</p>
-      <p className="text-gray-500">{product.stockBalance} {product.unit}</p>
+      <p className="text-gray-500">{product.stockBalance} {translateUnit(product.unit)}</p>
       {onAdd && (
         <button
           onClick={onAdd}

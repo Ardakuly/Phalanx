@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { createGoodReturnDocument } from "../api/goodReturnDocument";
 import { toast } from "react-toastify";
 import { FaTimes, FaUndo, FaMinus, FaPlus } from "react-icons/fa";
+import { translateUnit } from "../utils/unitTranslations";
 
 export default function GoodReturnModal({ isOpen, onClose, document, onSuccess }) {
   const [comment, setComment] = useState("");
@@ -112,7 +113,7 @@ export default function GoodReturnModal({ isOpen, onClose, document, onSuccess }
                         <div className="text-[10px] text-gray-400 font-mono">{item.barcode}</div>
                       </td>
                       <td className="px-4 py-3 text-center text-gray-600 font-medium">
-                        {item.quantity} {item.unit}
+                        {item.quantity} {translateUnit(item.unit)}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-center gap-2">

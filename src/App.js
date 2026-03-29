@@ -11,6 +11,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { InventarizationProvider } from "./context/InventarizationContext";
 import Inventarization from "./pages/Inventarization";
 import Receipts from "./pages/Receipts";
+import ReturnReceipts from "./pages/ReturnReceipts";
 
 export default function App() {
   return (
@@ -67,6 +68,16 @@ export default function App() {
                 <ProtectedRoute requireAdmin={true}>
                   <AppLayout>
                     <Receipts />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/returns"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AppLayout>
+                    <ReturnReceipts />
                   </AppLayout>
                 </ProtectedRoute>
               }
