@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import { useAuth } from "../context/AuthContext";
 import { useOutboundDocuments } from "../hooks/useOutboundDocuments";
-import { FaChevronDown, FaChevronUp, FaSearch, FaFilter, FaCalendarAlt } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaSearch, FaFilter, FaCalendarAlt, FaUndo } from "react-icons/fa";
+import GoodReturnModal from "../components/GoodReturnModal";
+
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
@@ -40,6 +42,15 @@ export default function Receipts() {
   } = useOutboundDocuments();
 
   const [expandedId, setExpandedId] = useState(null);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [selectedDocForReturn, setSelectedDocForReturn] = useState(null);
+
+  const handleOpenReturnModal = (e, doc) => {
+    e.stopPropagation();
+    setSelectedDocForReturn(doc);
+    setIsReturnModalOpen(true);
+  };
+
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -229,11 +240,22 @@ export default function Receipts() {
                                 ))}
                               </tbody>
                             </table>
-                            {doc.comment && (
-                              <div className="px-4 py-3 bg-blue-50 text-blue-700 text-xs italic">
-                                <strong>Комментарий:</strong> {doc.comment}
+                            <div className="px-4 py-3 bg-gray-50 flex items-center justify-between border-t border-gray-100">
+                              <div className="flex flex-col gap-1">
+                                {doc.comment && (
+                                  <div className="text-blue-700 text-xs italic">
+                                    <strong>Комментарий:</strong> {doc.comment}
+                                  </div>
+                                )}
                               </div>
-                            )}
+                              <button
+                                onClick={(e) => handleOpenReturnModal(e, doc)}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-xl transition-all text-xs border border-red-100"
+                              >
+                                <FaUndo size={10} />
+                                Оформить возврат
+                              </button>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -268,6 +290,16 @@ export default function Receipts() {
           </div>
         </div>
       </main>
+
+      <GoodReturnModal
+        isOpen={isReturnModalOpen}
+        onClose={() => setIsReturnModalOpen(false)}
+        document={selectedDocForReturn}
+        onSuccess={() => {
+          // No need to refresh receipts per user comment: 
+          // "Original receipt should not updated... The receipts for returned goods will be in another page."
+        }}
+      />
     </div>
   );
 }
