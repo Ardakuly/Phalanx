@@ -48,14 +48,15 @@ export const addProductsToStock = async (products) => {
   }
 };
 
-export const sellProducts = async (products) => {
+export const sellProducts = async (outboundDocumentDto) => {
   try {
-    // products MUST be an array of ProductRequestDto
-    // ProductRequestDto:
-    // name, barcode, unit, category, purchasedPrice, sellingPrice, stockBalance, photoUrl
+    // outboundDocumentDto:
+    // products: List<ProductSellDto>
+    // paymentType: PaymentType (CASH, CARD)
+    // comment: String
     const res = await axiosInstance.post(
       "/outbound-document/sell",
-      products
+      outboundDocumentDto
     );
 
     return res.data;

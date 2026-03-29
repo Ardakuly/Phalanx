@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthContext";
 
 import { InventarizationProvider } from "./context/InventarizationContext";
 import Inventarization from "./pages/Inventarization";
+import Receipts from "./pages/Receipts";
 
 export default function App() {
   return (
@@ -56,6 +57,16 @@ export default function App() {
                 <ProtectedRoute requireAdmin={true}>
                   <AppLayout>
                     <Inventarization />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/receipts"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AppLayout>
+                    <Receipts />
                   </AppLayout>
                 </ProtectedRoute>
               }

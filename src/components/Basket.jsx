@@ -7,12 +7,14 @@ export default function Basket({ basket, onIncrease, onDecrease, onRemove, onSel
   const { isStockFrozen } = useInventarization();
   const [showFrozenModal, setShowFrozenModal] = useState(false);
 
+  const [paymentType, setPaymentType] = useState("CASH");
+
   const handleSellClick = () => {
     if (isStockFrozen) {
       setShowFrozenModal(true);
       return;
     }
-    onSell();
+    onSell(paymentType);
   };
 
   return (
@@ -47,13 +49,34 @@ export default function Basket({ basket, onIncrease, onDecrease, onRemove, onSel
 
       {/* Bottom always visible */}
       <div className="border-t pt-3 shrink-0 bg-white">
-        <div className="flex justify-between text-lg font-semibold mb-2">
+        <div className="flex justify-between text-lg font-semibold mb-3">
           <span>Итого:</span>
           <span>{total} ₸</span>
         </div>
 
+        {/* Payment Method Selection */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {[
+            { id: "CASH", label: "Наличные" },
+            { id: "CARD", label: "Карта" },
+            { id: "QR", label: "Каспи QR" },
+          ].map((opt) => (
+            <button
+              key={opt.id}
+              onClick={() => setPaymentType(opt.id)}
+              className={`py-2 px-1 text-xs font-bold rounded-lg border transition-all ${
+                paymentType === opt.id
+                  ? "bg-blue-600 border-blue-600 text-white shadow-md"
+                  : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
         <button
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium"
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold text-lg shadow-lg active:scale-95 transition-transform"
           onClick={handleSellClick}
           disabled={basket.length === 0}
         >

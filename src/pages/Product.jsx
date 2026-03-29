@@ -159,7 +159,7 @@ export default function Products() {
           onIncrease={handleIncrease}
           onDecrease={handleDecrease}
           onRemove={handleRemove}
-          onSell={() => handleSell(fetchProducts)}
+          onSell={(pt) => handleSell(fetchProducts, pt)}
         />
       </div>
 

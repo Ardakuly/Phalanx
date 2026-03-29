@@ -44,7 +44,7 @@ export function useBasket() {
     setBasket((prev) => prev.filter((p) => p.key !== product.key));
   };
 
-  const handleSell = async (onSuccess) => {
+  const handleSell = async (onSuccess, paymentType = "CASH") => {
     if (basket.length === 0) {
       toast.info("Basket is empty");
       return;
@@ -58,7 +58,14 @@ export function useBasket() {
         quantity: p.count,
       }));
 
-      await sellProducts(productsToSell);
+      // Backend expects OutboundDocumentDto object
+      const payload = {
+          products: productsToSell,
+          paymentType,
+          comment: ""
+      };
+
+      await sellProducts(payload);
 
       toast.success("Products sold successfully");
 
