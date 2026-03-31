@@ -11,7 +11,7 @@ export default function Sidebar({ user }) {
   const links = [
     { name: "Продукты", path: "/products" },
     ...(isEmployer ? [
-      { name: "Чеки", path: "/receipts" },
+      { name: "Продажи", path: "/receipts" },
       { name: "Возвраты", path: "/returns" },
       { name: "Заканчивающиеся товары", path: "/leftovers" },
       { name: "Администрирование", path: "/admin" },

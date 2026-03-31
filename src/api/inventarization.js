@@ -35,3 +35,20 @@ export const getActiveInventarization = async () => {
         throw e;
     }
 };
+
+export const getInventarizations = async (filters = {}) => {
+  const payload = {
+    page: filters.page ?? 0,
+    pageSize: filters.pageSize ?? 10,
+    status: filters.status ?? null,
+    conductedBy: filters.conductedBy ?? null,
+    startedFrom: filters.startedFrom ?? null,
+    startedTo: filters.startedTo ?? null,
+    completedFrom: filters.completedFrom ?? null,
+    completedTo: filters.completedTo ?? null,
+    sortBy: filters.sortBy ?? "id",
+    sortDirection: filters.sortDirection ?? "DESC",
+  };
+  const res = await axiosInstance.post("/inventarization", payload);
+  return res.data;
+};

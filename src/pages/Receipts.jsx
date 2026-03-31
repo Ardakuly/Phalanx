@@ -74,7 +74,7 @@ export default function Receipts() {
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Чеки (Продажи)</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Продажи</h2>
             <p className="text-gray-500 mt-1">Всего найдено: {totalElements}</p>
           </div>
 

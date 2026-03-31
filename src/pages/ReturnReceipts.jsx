@@ -61,7 +61,7 @@ export default function ReturnReceipts() {
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Чеки возврата</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Возвраты</h2>
             <p className="text-gray-500 mt-1">Всего найдено: {totalElements}</p>
           </div>
 
@@ -120,7 +120,7 @@ export default function ReturnReceipts() {
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100">
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">№ Документа</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">№ Чека продажи</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">№ Продажи</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-red-600 transition-colors" onClick={() => handleSort("createdAt")}>
                     Дата {sortBy === "createdAt" && (sortDirection === "ASC" ? "↑" : "↓")}
                   </th>
