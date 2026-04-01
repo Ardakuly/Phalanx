@@ -12,6 +12,11 @@ export function useProducts() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortDirection, setSortDirection] = useState("DESC");
 
+  // Reset page to 0 on search change
+  useEffect(() => {
+    setPage(0);
+  }, [search]);
+
   // Fetch products (debounced)
   useEffect(() => {
     const timer = setTimeout(() => fetchProducts(), 300);

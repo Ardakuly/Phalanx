@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
+import logo from "../assets/logo.jpg";
 
 export default function Sidebar({ user }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -35,16 +36,18 @@ export default function Sidebar({ user }) {
         ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 w-64`}
       >
         <div className="p-6">
-          <h2 className="text-xl font-bold mb-6">Phalanx POS</h2>
+          <div className="flex items-center gap-3 mb-8">
+            <img src={logo} alt="Logo" className="w-12 h-12 object-contain" />
+            <h2 className="text-xl font-bold text-gray-800">Phalanx</h2>
+          </div>
 
           <nav className="flex flex-col gap-3">
             {links.map((link) => (
               <Link
                 key={link.name}
                 to={link.path}
-                className={`px-4 py-2 rounded-lg hover:bg-blue-100 ${
-                  location.pathname === link.path ? "bg-blue-200 font-semibold" : ""
-                }`}
+                className={`px-4 py-2 rounded-lg hover:bg-blue-100 ${location.pathname === link.path ? "bg-blue-200 font-semibold" : ""
+                  }`}
               >
                 {link.name}
               </Link>

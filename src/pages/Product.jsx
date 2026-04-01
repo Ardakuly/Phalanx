@@ -11,6 +11,7 @@ import { useBarcodeScanner } from "../hooks/useBarcodeScanner";
 import { getProductByBarcode } from "../api/product";
 import { toast } from "react-toastify";
 import { downloadLeftoverReport, downloadTransactionsReport } from "../api/report";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 
 export default function Products() {
@@ -135,21 +136,26 @@ export default function Products() {
           </div>
 
           {/* PAGINATION */}
-          <div className="flex gap-3 mt-4">
-            <button
-              disabled={page === 0}
-              onClick={() => setPage((p) => p - 1)}
-              className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
-            >
-              Prev
-            </button>
-            <button
-              disabled={page + 1 >= totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
-            >
-              Next
-            </button>
+          <div className="p-4 mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+            <p className="text-sm text-gray-500 font-medium">
+              Страница <span className="text-gray-900 font-bold">{page + 1}</span> из <span className="text-gray-900 font-bold">{totalPages || 1}</span>
+            </p>
+            <div className="flex gap-2">
+              <button
+                disabled={page === 0 || loading}
+                onClick={() => setPage((p) => p - 1)}
+                className="p-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 disabled:opacity-50 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                disabled={page + 1 >= totalPages || loading}
+                onClick={() => setPage((p) => p + 1)}
+                className="p-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 disabled:opacity-50 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
           </div>
         </div>
 

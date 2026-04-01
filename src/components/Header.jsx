@@ -37,7 +37,6 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
     <div className="flex justify-between items-center p-4 bg-white shadow-md" ref={ref}>
 
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-semibold text-gray-700">Point-of-Sale</h1>
         <FrozenStockBadge />
       </div>
 
@@ -50,9 +49,8 @@ export default function Header({ page, user, onAddProduct, onReportClick }) {
             <button
               onClick={onAddProduct}
               disabled={inventarizationLoading || isStockFrozen}
-              className={`text-white px-4 py-2 rounded-lg ${
-                inventarizationLoading || isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
-              }`}
+              className={`text-white px-4 py-2 rounded-lg ${inventarizationLoading || isStockFrozen ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+                }`}
             >
               Добавить продукт
             </button>

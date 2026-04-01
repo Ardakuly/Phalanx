@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 
 import Input from "../components/Input";
 import Button from "../components/Button";
+import logo from "../assets/logo.jpg";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function Login() {
       toast.success("Вход выполнен успешно!");
       navigate("/products");
     } catch (error) {
-        toast.error(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -35,7 +36,10 @@ export default function Login() {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-2xl w-full max-w-md shadow-lg"
       >
-        <h2 className="text-2xl font-semibold mb-6 text-center">Войти</h2>
+        <div className="flex flex-col items-center mb-6">
+          <img src={logo} alt="Phalanx Logo" className="w-24 h-24 object-contain mb-4" />
+          <h2 className="text-2xl font-semibold text-center">Войти</h2>
+        </div>
 
         <Input
           label="Почта"
