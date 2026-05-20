@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  phalanx-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: phalanx-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - shared-network
+
+# Connect to the external network created by the backend
+networks:
+  shared-network:
+    external: true
+    name: phalanx-shared-network
