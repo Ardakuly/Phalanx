@@ -38,6 +38,6 @@ export const getGoodReturnDocuments = async (filters = {}) => {
  * @param {number} payload.goods[].quantity - Quantity being returned
  */
 export const createGoodReturnDocument = async (payload) => {
-  const response = await axiosInstance.post("/good-return-documents", payload);
+  const response = await axiosInstance.post("/good-return-documents/create", payload);
   return response.data;
 };

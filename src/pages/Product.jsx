@@ -17,6 +17,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 export default function Products() {
   const { user } = useAuth();
   const [openModal, setOpenModal] = useState(false);
+  const [unknownBarcode, setUnknownBarcode] = useState("");
 
   const {
     products,
@@ -63,7 +64,22 @@ export default function Products() {
         toast.success(`Сканирован: ${productToAdd.name}`);
       }
     } catch (e) {
-      toast.error(`Продукт со штрихкодом ${barcode} не найден`);
+      toast.error(
+        <div>
+          <p className="mb-2">Продукт со штрихкодом {barcode} не найден</p>
+          <button 
+            onClick={() => {
+              setUnknownBarcode(barcode);
+              setOpenModal(true);
+              toast.dismiss(); // optional, but good to close the toast if they click it
+            }}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-sm w-full font-medium transition-colors"
+          >
+            Добавить продукт
+          </button>
+        </div>,
+        { autoClose: 5000, closeOnClick: false }
+      );
     }
   };
 
@@ -171,8 +187,12 @@ export default function Products() {
 
       <AddProductModal
         open={openModal}
-        onClose={() => setOpenModal(false)}
+        onClose={() => {
+          setOpenModal(false);
+          setUnknownBarcode("");
+        }}
         onSuccess={fetchProducts}
+        initialBarcode={unknownBarcode}
       />
     </div>
   );

@@ -1,16 +1,16 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { addProductsToStock, getProductByName } from "../api/product";
 import { useInventarization } from "../context/InventarizationContext";
 import { toast } from "react-toastify";
 import ProductFormRow from "./ProductFormRow";
 
-export default function AddProductModal({ open, onClose, onSuccess }) {
+export default function AddProductModal({ open, onClose, onSuccess, initialBarcode = "" }) {
   const { isStockFrozen } = useInventarization();
   const [products, setProducts] = useState([
     {
       rowId: Date.now(),
       name: "",
-      barcode: "",
+      barcode: initialBarcode,
       unit: "PIECE",
       category: "",
       purchasedPrice: "",
@@ -19,6 +19,24 @@ export default function AddProductModal({ open, onClose, onSuccess }) {
       photoUrl: "",
     },
   ]);
+
+  useEffect(() => {
+    if (open) {
+      setProducts([
+        {
+          rowId: Date.now(),
+          name: "",
+          barcode: initialBarcode || "",
+          unit: "PIECE",
+          category: "",
+          purchasedPrice: "",
+          sellingPrice: "",
+          stockBalance: "",
+          photoUrl: "",
+        },
+      ]);
+    }
+  }, [open, initialBarcode]);
 
   // one debounce timer per row
   const searchTimeoutsRef = useRef({});
