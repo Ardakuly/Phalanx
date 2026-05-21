@@ -12,6 +12,7 @@ import { InventarizationProvider } from "./context/InventarizationContext";
 import Inventarization from "./pages/Inventarization";
 import Receipts from "./pages/Receipts";
 import ReturnReceipts from "./pages/ReturnReceipts";
+import InboundDocuments from "./pages/InboundDocuments";
 
 export default function App() {
   return (
@@ -58,6 +59,16 @@ export default function App() {
                 <ProtectedRoute requireAdmin={true}>
                   <AppLayout>
                     <Inventarization />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inbound-documents"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AppLayout>
+                    <InboundDocuments />
                   </AppLayout>
                 </ProtectedRoute>
               }
