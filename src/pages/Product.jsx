@@ -11,7 +11,7 @@ import { useBarcodeScanner } from "../hooks/useBarcodeScanner";
 import { getProductByBarcode } from "../api/product";
 import { toast } from "react-toastify";
 import { downloadLeftoverReport, downloadTransactionsReport } from "../api/report";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+
 
 
 export default function Products() {
@@ -160,16 +160,16 @@ export default function Products() {
               <button
                 disabled={page === 0 || loading}
                 onClick={() => setPage((p) => p - 1)}
-                className="p-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 disabled:opacity-50 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
+                className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                <ChevronLeft size={20} />
+                Назад
               </button>
               <button
                 disabled={page + 1 >= totalPages || loading}
                 onClick={() => setPage((p) => p + 1)}
-                className="p-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 disabled:opacity-50 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
+                className="px-4 py-2 bg-blue-600 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                <ChevronRight size={20} />
+                Вперед
               </button>
             </div>
           </div>
