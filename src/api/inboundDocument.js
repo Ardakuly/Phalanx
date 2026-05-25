@@ -43,3 +43,14 @@ export const updateInboundGood = async (payload) => {
   const response = await axiosInstance.put("/admin/inbound-document/update", payload);
   return response.data;
 };
+
+/**
+ * Deletes an inbound document good by its externalId.
+ * 
+ * @param {string} externalId - The external ID of the good to delete.
+ */
+export const deleteInboundGood = async (externalId) => {
+  const response = await axiosInstance.delete(`/admin/inbound-document/good/${externalId}`);
+  return response.data;
+};
+

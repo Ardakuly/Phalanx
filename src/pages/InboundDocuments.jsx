@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import { useAuth } from "../context/AuthContext";
 import { useInboundDocuments } from "../hooks/useInboundDocuments";
-import { FaChevronDown, FaChevronUp, FaSearch, FaCalendarAlt, FaEdit } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaSearch, FaCalendarAlt, FaEdit, FaTrash } from "react-icons/fa";
 import { translateUnit } from "../utils/unitTranslations";
 import InboundGoodEditModal from "../components/InboundGoodEditModal";
-import { updateInboundGood } from "../api/inboundDocument";
+import { updateInboundGood, deleteInboundGood } from "../api/inboundDocument";
 import { toast } from "react-toastify";
 
 const formatDate = (dateString) => {
@@ -39,6 +39,7 @@ export default function InboundDocuments() {
     setSortBy,
     sortDirection,
     setSortDirection,
+    fetchDocuments,
   } = useInboundDocuments();
 
   const [expandedId, setExpandedId] = useState(null);
@@ -74,6 +75,20 @@ export default function InboundDocuments() {
     e.stopPropagation();
     setSelectedGood(good);
     setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = async (e, good) => {
+    e.stopPropagation();
+    const confirmed = window.confirm(`Вы уверены, что хотите удалить товар "${good.name}"?`);
+    if (!confirmed) return;
+
+    try {
+      await deleteInboundGood(good.externalId);
+      toast.success("Товар успешно удален");
+      fetchDocuments();
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Ошибка при удалении товара");
+    }
   };
 
   const handleEditSubmit = async (formData) => {
@@ -236,13 +251,22 @@ export default function InboundDocuments() {
                                     <td className="px-4 py-3 text-right text-blue-600">{good.sellingPrice?.toLocaleString()} ₸</td>
                                     <td className="px-4 py-3 text-right font-medium">{(good.purchasedPrice * good.quantity)?.toLocaleString()} ₸</td>
                                     <td className="px-4 py-3 text-center">
-                                      <button
-                                        onClick={(e) => handleEditClick(e, good)}
-                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                        title="Редактировать товар"
-                                      >
-                                        <FaEdit size={14} />
-                                      </button>
+                                      <div className="flex items-center justify-center gap-1">
+                                        <button
+                                          onClick={(e) => handleEditClick(e, good)}
+                                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                          title="Редактировать товар"
+                                        >
+                                          <FaEdit size={14} />
+                                        </button>
+                                        <button
+                                          onClick={(e) => handleDeleteClick(e, good)}
+                                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                          title="Удалить товар"
+                                        >
+                                          <FaTrash size={14} />
+                                        </button>
+                                      </div>
                                     </td>
                                   </tr>
                                 ))}
