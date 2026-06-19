@@ -7,6 +7,7 @@ import { translateUnit } from "../utils/unitTranslations";
 import InboundGoodEditModal from "../components/InboundGoodEditModal";
 import { updateInboundGood, deleteInboundGood } from "../api/inboundDocument";
 import { toast } from "react-toastify";
+import { getProductImageUrl } from "../utils/imageUtils";
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
@@ -236,7 +237,7 @@ export default function InboundDocuments() {
                                   <tr key={good.externalId} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-4 py-3 flex items-center gap-3">
                                       {good.photoUrl ? (
-                                        <img src={good.photoUrl} alt={good.name} className="w-8 h-8 rounded-md object-cover border border-gray-100" />
+                                        <img src={getProductImageUrl(good.photoUrl)} alt={good.name} className="w-8 h-8 rounded-md object-cover border border-gray-100" />
                                       ) : (
                                         <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-[10px]">N/A</div>
                                       )}
